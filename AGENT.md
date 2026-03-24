@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Trip Split is a Next.js web app for splitting trip expenses among friends. See `VISION.md` for full product vision.
+Trip Split is a Next.js web app for splitting trip expenses among friends.
 
 ## Tech Stack
 
@@ -65,5 +65,5 @@ pnpm build        # Production build
 pnpm lint         # Lint
 pnpm format       # Format
 pnpm test         # Run tests
-pnpm tsc --noEmit # Type check
+pnpm typecheck    # Type check
 ```
