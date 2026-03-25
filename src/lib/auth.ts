@@ -5,18 +5,20 @@ import {
   getAuth,
 } from "firebase/auth";
 
-import { firebaseApp } from "./firebase";
+import { getFirebaseApp } from "./firebase";
 
-export const auth = getAuth(firebaseApp);
+function getFirebaseAuth() {
+  return getAuth(getFirebaseApp());
+}
 
 export async function signUp(email: string, password: string) {
-  return createUserWithEmailAndPassword(auth, email, password);
+  return createUserWithEmailAndPassword(getFirebaseAuth(), email, password);
 }
 
 export async function signIn(email: string, password: string) {
-  return signInWithEmailAndPassword(auth, email, password);
+  return signInWithEmailAndPassword(getFirebaseAuth(), email, password);
 }
 
 export async function signOut() {
-  return firebaseSignOut(auth);
+  return firebaseSignOut(getFirebaseAuth());
 }
