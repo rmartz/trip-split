@@ -2,7 +2,6 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 import { signIn, signUp } from "@/lib/auth";
-import { getAuthErrorMessage } from "@/lib/auth-errors";
 
 interface AuthCredentials {
   email: string;
@@ -18,7 +17,6 @@ export function useSignInMutation() {
     onSuccess: () => {
       router.push("/dashboard");
     },
-    meta: { getErrorMessage: getAuthErrorMessage },
   });
 }
 
@@ -31,6 +29,5 @@ export function useSignUpMutation() {
     onSuccess: () => {
       router.push("/dashboard");
     },
-    meta: { getErrorMessage: getAuthErrorMessage },
   });
 }

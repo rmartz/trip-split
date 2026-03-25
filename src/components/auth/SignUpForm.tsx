@@ -73,6 +73,7 @@ export function SignUpForm() {
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
+                setValidationError(undefined);
               }}
               autoComplete="email"
             />
@@ -85,6 +86,7 @@ export function SignUpForm() {
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
+                setValidationError(undefined);
               }}
               autoComplete="new-password"
             />
@@ -99,6 +101,7 @@ export function SignUpForm() {
               value={confirmPassword}
               onChange={(e) => {
                 setConfirmPassword(e.target.value);
+                setValidationError(undefined);
               }}
               autoComplete="new-password"
             />
