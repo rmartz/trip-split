@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { signUp } from "@/lib/auth";
+import { useSignUpMutation } from "@/lib/hooks";
 import { getAuthErrorMessage } from "@/lib/auth-errors";
 import { AUTH_COPY } from "@/constants/copy";
 
@@ -22,12 +21,14 @@ const copy = AUTH_COPY.signUp;
 const errors = AUTH_COPY.errors;
 
 export function SignUpForm() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState<string | undefined>(undefined);
-  const [loading, setLoading] = useState(false);
+  const [validationError, setValidationError] = useState<string | undefined>(
+    undefined,
+  );
+
+  const mutation = useSignUpMutation();
 
   const validate = (): string | undefined => {
     if (!email.trim()) return errors.emailRequired;
@@ -38,30 +39,22 @@ export function SignUpForm() {
     return undefined;
   };
 
-  const submitAuth = async () => {
-    setLoading(true);
-    try {
-      await signUp(email, password);
-      router.push("/dashboard");
-    } catch (err: unknown) {
-      setError(getAuthErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    setError(undefined);
+    setValidationError(undefined);
 
-    const validationError = validate();
-    if (validationError) {
-      setError(validationError);
+    const error = validate();
+    if (error) {
+      setValidationError(error);
       return;
     }
 
-    void submitAuth();
+    mutation.mutate({ email, password });
   };
+
+  const displayError =
+    validationError ??
+    (mutation.error ? getAuthErrorMessage(mutation.error) : undefined);
 
   return (
     <Card className="w-full max-w-sm">
@@ -110,13 +103,17 @@ export function SignUpForm() {
               autoComplete="new-password"
             />
           </div>
-          {error && (
+          {displayError && (
             <p className="text-destructive text-sm" role="alert">
-              {error}
+              {displayError}
             </p>
           )}
-          <Button type="submit" className="w-full" disabled={loading}>
-            {copy.submitButton}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={mutation.isPending}
+          >
+            {mutation.isPending ? copy.submittingButton : copy.submitButton}
           </Button>
           <p className="text-muted-foreground text-center text-sm">
             {copy.hasAccount}{" "}
