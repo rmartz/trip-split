@@ -1,3 +1,15 @@
+export const NAV_COPY = {
+  appName: "Trip Split",
+  signIn: "Sign in",
+  signUp: "Sign up",
+  signOut: "Sign out",
+} as const;
+
+export const DASHBOARD_COPY = {
+  title: "Dashboard",
+  empty: "You don\u2019t have any trips yet.",
+} as const;
+
 export const AUTH_COPY = {
   signIn: {
     title: "Sign in",
