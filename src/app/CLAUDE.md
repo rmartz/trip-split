@@ -15,11 +15,6 @@ Rules specific to React components, pages, and layouts in the Next.js App Router
 - Simple functional expressions are permitted in JSX: inline arrow functions, ternaries, and `.map()` calls that return JSX directly.
 - What is prohibited is multi-statement blocks: declaring intermediate variables and then returning a value inside JSX.
 
-## User-Facing Text
-
-- Copy strings may be co-located with their component (`ComponentName.copy.ts`) or placed in `src/constants/copy.ts` for shared strings.
-- Prefer co-located copy for component-specific strings; use `constants/copy.ts` for strings shared across multiple components.
-
 ## Firestore Access
 
 - Never access Firestore directly in components. Use service functions from `src/api/`.

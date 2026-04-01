@@ -20,7 +20,6 @@ src/
   app/           # Next.js App Router pages and layouts
   api/           # Firebase services and data access functions
   components/    # Reusable React components
-  constants/     # Shared constants and copy strings
   types/         # TypeScript type definitions
 ```
 
