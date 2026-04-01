@@ -32,12 +32,12 @@ src/
 
 ## File Organization
 
-- Keep files under ~200 lines. Split large files by logical concern.
+- **Source files**: Keep under ~200 lines (split at ~240). Split large files by logical concern.
+- **Test files**: Keep under ~300 lines (split at ~360). When splitting, organize into a `{module}-tests/` directory with domain-specific files.
 - **Components**: One component and its props interface per file. Delegate complex logic to utility functions or sub-components.
 - **Type files**: Convert large type files into barrel-exported directories with one file per logical domain.
 - **Utility files**: Split by the type of operation or domain they serve.
 - **Service files**: Extract complex logic into focused utility functions or smaller services.
-- **Test files**: When a file is split, create a corresponding test file for each portion.
 - Barrel `index.ts` exports for all component/module directories.
 
 ## Code Conventions
@@ -49,7 +49,7 @@ src/
 
 ## User-Facing Text
 
-- All user-facing strings must be stored in a constants/copy file (e.g., `copy.ts`) for i18n readiness.
+- All user-facing strings must be stored in a co-located copy file (e.g., `ComponentName.copy.ts` or `copy.ts`) for i18n readiness.
 - Do not hardcode display strings inline in components.
 
 ## Testing
@@ -57,13 +57,31 @@ src/
 - Unit test business logic (especially balance calculations) with Vitest.
 - Use the Firebase emulator for integration tests.
 
+### Component Tests
+
+- Test files are co-located with their component: `ComponentName.test.tsx`.
+- When adding or modifying a UI component, add or update its test to verify rendering behavior and key prop-driven states.
+- Use `@testing-library/react` with `vitest`. Always call `afterEach(cleanup)`.
+- Do not use `.toBeInTheDocument()` -- use `.toBeDefined()` or check `.textContent` instead.
+- Assert against copy constants (e.g., `AUTH_COPY`) rather than hardcoded strings.
+- Test presentational view components directly; avoid mocking hooks in tests where possible.
+
+## Storybook
+
+- Story files are co-located with their component: `ComponentName.stories.tsx`.
+- When adding or modifying a UI component, add or update its Storybook story to cover key visual states.
+- Stories should use mock data fixtures -- never import from Firebase or depend on runtime providers (QueryClient, AuthProvider, Next.js router).
+- Components that are too hook-dependent to render in isolation should use a presentational split: extract rendering into a `ComponentNameView` that accepts callbacks, and keep the original as a thin wrapper that wires up hooks.
+
 ## Common Commands
 
 ```bash
-pnpm dev          # Start dev server
-pnpm build        # Production build
-pnpm lint         # Lint
-pnpm format       # Format
-pnpm test         # Run tests
-pnpm typecheck    # Type check
+pnpm dev              # Start dev server
+pnpm build            # Production build
+pnpm lint             # Lint
+pnpm format           # Format
+pnpm test             # Run tests
+pnpm typecheck        # Type check
+pnpm storybook        # Start Storybook dev server (port 6006)
+pnpm build-storybook  # Build static Storybook
 ```

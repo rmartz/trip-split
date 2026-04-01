@@ -41,6 +41,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# storybook
+storybook-static/
+
 # lock files from wrong package managers
 package-lock.json
 yarn.lock
