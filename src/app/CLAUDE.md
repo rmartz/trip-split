@@ -8,4 +8,4 @@ Rules specific to React components, pages, and layouts in the Next.js App Router
 
 ## Firestore Access
 
-- Never access Firestore directly in components. Use service functions from `src/api/`.
+- Never access Firestore directly in components. Use service functions from `src/services/`.

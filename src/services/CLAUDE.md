@@ -1,4 +1,4 @@
-# API & Data Access Directives
+# Service Layer Directives
 
 Rules specific to Firebase services, Firestore queries, and data access functions.
 

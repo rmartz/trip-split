@@ -36,7 +36,7 @@ Trip Split is a Next.js web app for splitting trip expenses among friends.
 ```
 src/
   app/           # Next.js App Router pages and layouts
-  api/           # Firebase services and data access functions
+  services/      # Firebase services and data access functions
   components/    # Reusable React components with co-located stories and tests
   lib/           # Firebase SDK wrappers, auth, hooks, and utilities
   types/         # TypeScript type definitions (barrel-exported)
