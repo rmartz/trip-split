@@ -2,6 +2,7 @@ import js from "@eslint/js";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 import reactHooks from "eslint-plugin-react-hooks";
+import storybook from "eslint-plugin-storybook";
 
 export default tseslint.config(
   {
@@ -13,6 +14,7 @@ export default tseslint.config(
       "*.config.ts",
       "*.config.mjs",
       "src/components/ui/**",
+      ".storybook/**",
     ],
   },
   js.configs.recommended,
@@ -64,4 +66,5 @@ export default tseslint.config(
       "@typescript-eslint/no-non-null-assertion": "off",
     },
   },
+  storybook.configs["flat/recommended"],
 );
