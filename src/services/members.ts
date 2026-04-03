@@ -3,6 +3,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   serverTimestamp,
 } from "firebase/firestore";
@@ -21,11 +22,14 @@ export async function addMember(
     createdAt: serverTimestamp(),
   });
 
-  return {
-    ...member,
-    createdAt: new Date(),
-    id: docRef.id,
-  };
+  const snapshot = await getDoc(docRef);
+  const data = snapshot.data();
+
+  if (!data) {
+    throw new Error("Failed to read member after creation");
+  }
+
+  return firebaseToMember(docRef.id, data);
 }
 
 export async function getMembers(tripId: string): Promise<TripMember[]> {

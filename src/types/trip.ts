@@ -1,7 +1,7 @@
 export interface Trip {
   createdAt: Date;
   createdBy: string;
-  description: string | undefined;
+  description?: string;
   id: string;
   name: string;
   updatedAt: Date;
@@ -12,5 +12,5 @@ export interface TripMember {
   createdAt: Date;
   id: string;
   name: string;
-  userId: string | undefined;
+  userId?: string;
 }
