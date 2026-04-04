@@ -1,42 +1,39 @@
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  serverTimestamp,
-} from "firebase/firestore";
+import { get, push, ref, remove, set } from "firebase/database";
 
-import { getDb } from "@/lib/firestore";
+import { getDb } from "@/lib/database";
 import type { TripMember } from "@/types";
-import { firebaseToMember, memberToFirestore } from "./trip-schema";
+import { firebaseToMember, memberToFirebase } from "./trip-schema";
 
 export async function addMember(
   tripId: string,
   member: Omit<TripMember, "id" | "createdAt">,
 ): Promise<TripMember> {
   const db = getDb();
-  const docRef = await addDoc(collection(db, "trips", tripId, "members"), {
-    ...memberToFirestore(member),
-    createdAt: serverTimestamp(),
-  });
+  const memberRef = push(ref(db, `members/${tripId}`));
 
-  const snapshot = await getDoc(docRef);
-  const data = snapshot.data();
+  const data = {
+    ...memberToFirebase(member),
+    createdAt: new Date().toISOString(),
+  };
 
-  if (!data) {
-    throw new Error("Failed to read member after creation");
-  }
+  await set(memberRef, data);
 
-  return firebaseToMember(docRef.id, data);
+  return firebaseToMember(memberRef.key, data);
 }
 
 export async function getMembers(tripId: string): Promise<TripMember[]> {
   const db = getDb();
-  const snapshot = await getDocs(collection(db, "trips", tripId, "members"));
+  const snapshot = await get(ref(db, `members/${tripId}`));
 
-  return snapshot.docs.map((d) => firebaseToMember(d.id, d.data()));
+  if (!snapshot.exists()) {
+    return [];
+  }
+
+  const data = snapshot.val() as Record<string, Record<string, unknown>>;
+
+  return Object.entries(data).map(([id, memberData]) =>
+    firebaseToMember(id, memberData),
+  );
 }
 
 export async function removeMember(
@@ -44,5 +41,5 @@ export async function removeMember(
   memberId: string,
 ): Promise<void> {
   const db = getDb();
-  await deleteDoc(doc(db, "trips", tripId, "members", memberId));
+  await remove(ref(db, `members/${tripId}/${memberId}`));
 }

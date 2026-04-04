@@ -1,26 +1,23 @@
-import { Timestamp } from "firebase/firestore";
-import type { DocumentData } from "firebase/firestore";
-
 import type { Trip, TripMember } from "@/types";
 
-export interface TripFirestore {
-  createdAt: Timestamp;
+export interface TripFirebase {
+  createdAt: string;
   createdBy: string;
   description: string | null;
   name: string;
-  updatedAt: Timestamp;
+  updatedAt: string;
 }
 
-export interface TripMemberFirestore {
+export interface TripMemberFirebase {
   addedBy: string;
-  createdAt: Timestamp;
+  createdAt: string;
   name: string;
   userId: string | null;
 }
 
-export function tripToFirestore(
+export function tripToFirebase(
   trip: Omit<Trip, "id" | "createdAt" | "updatedAt">,
-): Omit<TripFirestore, "createdAt" | "updatedAt"> {
+): Omit<TripFirebase, "createdAt" | "updatedAt"> {
   return {
     createdBy: trip.createdBy,
     description: trip.description ?? null,
@@ -28,20 +25,23 @@ export function tripToFirestore(
   };
 }
 
-export function firebaseToTrip(id: string, data: DocumentData): Trip {
+export function firebaseToTrip(
+  id: string,
+  data: Record<string, unknown>,
+): Trip {
   return {
-    createdAt: (data.createdAt as Timestamp).toDate(),
+    createdAt: new Date(data.createdAt as string),
     createdBy: data.createdBy as string,
     description: (data.description as string | null) ?? undefined,
     id,
     name: data.name as string,
-    updatedAt: (data.updatedAt as Timestamp).toDate(),
+    updatedAt: new Date(data.updatedAt as string),
   };
 }
 
-export function memberToFirestore(
+export function memberToFirebase(
   member: Omit<TripMember, "id" | "createdAt">,
-): Omit<TripMemberFirestore, "createdAt"> {
+): Omit<TripMemberFirebase, "createdAt"> {
   return {
     addedBy: member.addedBy,
     name: member.name,
@@ -49,10 +49,13 @@ export function memberToFirestore(
   };
 }
 
-export function firebaseToMember(id: string, data: DocumentData): TripMember {
+export function firebaseToMember(
+  id: string,
+  data: Record<string, unknown>,
+): TripMember {
   return {
     addedBy: data.addedBy as string,
-    createdAt: (data.createdAt as Timestamp).toDate(),
+    createdAt: new Date(data.createdAt as string),
     id,
     name: data.name as string,
     userId: (data.userId as string | null) ?? undefined,
