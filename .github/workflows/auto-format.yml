@@ -25,19 +25,9 @@ jobs:
           ref: ${{ github.event.workflow_run.head_sha }}
           token: ${{ secrets.CI_PAT_TOKEN }}
 
-      - uses: pnpm/action-setup@v5
-        with:
-          version: 10
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24.x
-          cache: "pnpm"
-
-      - run: pnpm install --frozen-lockfile
-
-      - name: Run Prettier
-        run: pnpm prettier --write .
+      # Install prettier directly (not from repo package.json) to avoid
+      # executing untrusted lifecycle scripts from the checked-out code.
+      - run: npx prettier@3 --write .
 
       - name: Check for changes
         id: diff
