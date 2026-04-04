@@ -1,5 +1,5 @@
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { TRIP_DETAIL_COPY } from "./TripDetail.copy";
+import { TripDetailContent } from "./TripDetailContent";
 
 interface TripDetailPageProps {
   params: Promise<{ tripId: string }>;
@@ -10,11 +10,7 @@ export default async function TripDetailPage({ params }: TripDetailPageProps) {
 
   return (
     <ProtectedRoute>
-      <div className="mx-auto w-full max-w-5xl px-4 py-8">
-        <p className="text-muted-foreground">
-          {TRIP_DETAIL_COPY.loading} (ID: {tripId})
-        </p>
-      </div>
+      <TripDetailContent tripId={tripId} />
     </ProtectedRoute>
   );
 }
