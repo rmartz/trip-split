@@ -87,6 +87,33 @@ export async function getUserTrips(userId: string): Promise<Trip[]> {
   return trips.filter((t): t is Trip => t !== undefined);
 }
 
+export async function deleteTrip(tripId: string): Promise<void> {
+  const db = getDb();
+
+  const membersSnapshot = await get(ref(db, `members/${tripId}`));
+  const updates: Record<string, null> = {
+    [`trips/${tripId}`]: null,
+    [`members/${tripId}`]: null,
+  };
+
+  if (membersSnapshot.exists()) {
+    const members = membersSnapshot.val() as Record<
+      string,
+      Record<string, unknown>
+    >;
+
+    for (const memberData of Object.values(members)) {
+      const userId = memberData.userId as string | null;
+
+      if (userId) {
+        updates[`userTrips/${userId}/${tripId}`] = null;
+      }
+    }
+  }
+
+  await update(ref(db), updates);
+}
+
 export async function updateTrip(
   tripId: string,
   updates: Partial<Pick<Trip, "description" | "name">>,
