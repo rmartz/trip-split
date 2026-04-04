@@ -20,9 +20,19 @@ export function NavbarView({
   return (
     <nav className="border-b">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-        <Link href="/" className="text-lg font-semibold">
-          {NAV_COPY.appName}
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/" className="text-lg font-semibold">
+            {NAV_COPY.appName}
+          </Link>
+          {userEmail && (
+            <Link
+              href="/dashboard"
+              className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+            >
+              {NAV_COPY.dashboard}
+            </Link>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           {userEmail ? (
             <>
