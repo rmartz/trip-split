@@ -1,0 +1,17 @@
+export const ADD_EXPENSE_COPY = {
+  addingButton: "Adding\u2026",
+  amountInvalid: "Enter a positive amount",
+  amountLabel: "Amount",
+  amountPlaceholder: "0.00",
+  cancelButton: "Cancel",
+  descriptionLabel: "Description",
+  descriptionPlaceholder: "e.g. Dinner, Hotel, Taxi",
+  descriptionRequired: "Description is required",
+  loading: "Loading\u2026",
+  paidByLabel: "Paid by",
+  splitAmongLabel: "Split among",
+  splitAmongRequired: "Select at least one member",
+  submitButton: "Add Expense",
+  subtitle: "Record a new expense for this trip",
+  title: "Add Expense",
+} as const;

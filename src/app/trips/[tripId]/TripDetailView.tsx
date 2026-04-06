@@ -1,6 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
+import { Button, buttonVariants } from "@/components/ui/button";
 import type { Trip, TripMember } from "@/types";
 import { AddMemberForm } from "./AddMemberForm";
 import { MemberList } from "./MemberList";
@@ -52,6 +54,17 @@ export function TripDetailView({
               : TRIP_DETAIL_COPY.deleteTrip}
           </Button>
         )}
+      </div>
+      <div className="mt-8">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-medium">{TRIP_DETAIL_COPY.expenses}</h2>
+          <Link
+            href={`/trips/${trip.id}/expenses/new`}
+            className={buttonVariants({ size: "sm" })}
+          >
+            {TRIP_DETAIL_COPY.addExpense}
+          </Link>
+        </div>
       </div>
       <div className="mt-8">
         <h2 className="text-lg font-medium">{TRIP_DETAIL_COPY.members}</h2>
