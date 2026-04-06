@@ -108,7 +108,7 @@ src/
 
 ## Component Tests
 
-- Test files are co-located with their component: `ComponentName.test.tsx`.
+- Test files are co-located with their component: `ComponentName.spec.tsx`.
 - When adding or modifying a UI component, add or update its test to verify rendering behavior and key prop-driven states.
 - Use `@testing-library/react` with `vitest`. Always call `afterEach(cleanup)`.
 - Do not use `.toBeInTheDocument()` -- use `.toBeDefined()` or check `.textContent` instead.
