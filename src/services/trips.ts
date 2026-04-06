@@ -92,8 +92,9 @@ export async function deleteTrip(tripId: string): Promise<void> {
 
   const membersSnapshot = await get(ref(db, `members/${tripId}`));
   const updates: Record<string, null> = {
-    [`trips/${tripId}`]: null,
+    [`expenses/${tripId}`]: null,
     [`members/${tripId}`]: null,
+    [`trips/${tripId}`]: null,
   };
 
   if (membersSnapshot.exists()) {

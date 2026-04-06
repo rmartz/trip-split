@@ -1,4 +1,4 @@
-import { get, push, ref, remove, update } from "firebase/database";
+import { get, push, ref, remove, set, update } from "firebase/database";
 
 import { getDb } from "@/lib/database";
 import type { Expense } from "@/types";
@@ -19,7 +19,7 @@ export async function addExpense(
     updatedAt: now,
   };
 
-  await update(expenseRef, data);
+  await set(expenseRef, data);
 
   return firebaseToExpense(expenseRef.key, data);
 }
