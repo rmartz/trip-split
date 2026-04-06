@@ -79,6 +79,7 @@ describe("NavbarView", () => {
     );
 
     const button = screen.getByText(NAV_COPY.signOut).closest("button");
-    expect(button?.disabled).toBe(true);
+    expect(button).toBeDefined();
+    expect(button!.disabled).toBe(true);
   });
 });
