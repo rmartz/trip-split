@@ -13,9 +13,10 @@ Rules specific to Firebase services, Realtime Database queries, and data access 
 RTDB is a flat JSON tree. Data is organized at top-level paths to avoid deep nesting:
 
 ```
-trips/{tripId}           # Trip data
-members/{tripId}/{id}    # Members per trip
-userTrips/{userId}/{id}  # Denormalized index for user trip lookup
+trips/{tripId}                  # Trip data
+members/{tripId}/{id}           # Members per trip
+expenses/{tripId}/{expenseId}   # Expenses per trip
+userTrips/{userId}/{id}         # Denormalized index for user trip lookup
 ```
 
 ## Monetary Values
