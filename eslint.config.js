@@ -11,8 +11,7 @@ export default tseslint.config(
       "**/node_modules/**",
       "**/.next/**",
       "**/next-env.d.ts",
-      "*.config.ts",
-      "*.config.mjs",
+      "*.config.{ts,mts,mjs}",
       "src/components/ui/**",
       ".storybook/**",
     ],
@@ -57,7 +56,7 @@ export default tseslint.config(
   },
   // Test files use Response.json() which inherently returns `any`; relax unsafe rules
   {
-    files: ["src/**/*.test.ts"],
+    files: ["src/**/*.test.{ts,tsx}"],
     rules: {
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
