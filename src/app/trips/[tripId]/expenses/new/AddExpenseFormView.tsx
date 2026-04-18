@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { TripMember } from "@/types";
-import { ADD_EXPENSE_COPY } from "./AddExpenseForm.copy";
+import { ADD_EXPENSE_COPY } from "./AddExpenseFormView.copy";
 
 const copy = ADD_EXPENSE_COPY;
 
@@ -63,8 +63,17 @@ export function AddExpenseFormView({
       return;
     }
 
-    const parsedAmount = parseFloat(amount);
-    if (!amount || isNaN(parsedAmount) || parsedAmount <= 0) {
+    const amountRegex = /^\d+(\.\d{1,2})?$/;
+    if (!amountRegex.test(amount.trim())) {
+      setValidationError(copy.amountInvalid);
+      return;
+    }
+    const trimmed = amount.trim();
+    const [intStr, fracStr] = trimmed.split(".");
+    const totalCents =
+      parseInt(intStr, 10) * 100 +
+      (trimmed.includes(".") ? parseInt(fracStr.padEnd(2, "0"), 10) : 0);
+    if (totalCents <= 0) {
       setValidationError(copy.amountInvalid);
       return;
     }
@@ -74,12 +83,7 @@ export function AddExpenseFormView({
       return;
     }
 
-    onSubmit(
-      description.trim(),
-      Math.round(parsedAmount * 100),
-      paidByMemberId,
-      splitAmong,
-    );
+    onSubmit(description.trim(), totalCents, paidByMemberId, splitAmong);
   };
 
   const displayError = validationError ?? error;
@@ -126,47 +130,70 @@ export function AddExpenseFormView({
               <Label htmlFor="expense-paid-by">{copy.paidByLabel}</Label>
               <select
                 id="expense-paid-by"
-                value={paidByMemberId}
+                value={members.length > 0 ? paidByMemberId : ""}
                 onChange={(e) => {
                   setPaidByMemberId(e.target.value);
                 }}
+                disabled={members.length === 0}
                 className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 w-full rounded-lg border bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {members.map((member) => (
-                  <option key={member.id} value={member.id}>
-                    {member.name}
+                {members.length === 0 ? (
+                  <option value="" disabled>
+                    {copy.noMembersPaidByPlaceholder}
                   </option>
-                ))}
+                ) : (
+                  members.map((member) => (
+                    <option key={member.id} value={member.id}>
+                      {member.name}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
             <div className="space-y-2">
               <Label>{copy.splitAmongLabel}</Label>
               <div className="space-y-1.5">
-                {members.map((member) => (
-                  <label
-                    key={member.id}
-                    className="flex cursor-pointer items-center gap-2 text-sm"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={splitAmong.includes(member.id)}
-                      onChange={() => {
-                        handleToggleMember(member.id);
-                      }}
-                      className="border-input rounded"
-                    />
-                    {member.name}
-                  </label>
-                ))}
+                {members.length === 0 ? (
+                  <p className="text-muted-foreground text-sm">
+                    {copy.noMembersEmptyState}{" "}
+                    <Link
+                      href={`/trips/${tripId}`}
+                      className="text-primary underline underline-offset-4"
+                    >
+                      {copy.noMembersGoBackLink}
+                    </Link>
+                  </p>
+                ) : (
+                  members.map((member) => (
+                    <label
+                      key={member.id}
+                      className="flex cursor-pointer items-center gap-2 text-sm"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={splitAmong.includes(member.id)}
+                        onChange={() => {
+                          handleToggleMember(member.id);
+                        }}
+                        className="border-input rounded"
+                      />
+                      {member.name}
+                    </label>
+                  ))
+                )}
               </div>
             </div>
-            {displayError && (
+            {members.length > 0 && displayError && (
               <p className="text-destructive text-sm" role="alert">
                 {displayError}
               </p>
             )}
             <div className="flex gap-2">
-              <Button type="submit" className="flex-1" disabled={isPending}>
+              <Button
+                type="submit"
+                className="flex-1"
+                disabled={isPending || members.length === 0}
+              >
                 {isPending ? copy.addingButton : copy.submitButton}
               </Button>
               <Link

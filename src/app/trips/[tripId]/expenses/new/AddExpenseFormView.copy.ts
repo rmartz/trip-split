@@ -8,6 +8,10 @@ export const ADD_EXPENSE_COPY = {
   descriptionPlaceholder: "e.g. Dinner, Hotel, Taxi",
   descriptionRequired: "Description is required",
   loading: "Loading\u2026",
+  noMembersEmptyState:
+    "Add at least one trip member before creating an expense.",
+  noMembersGoBackLink: "Go back to manage members",
+  noMembersPaidByPlaceholder: "Add trip members to choose who paid",
   paidByLabel: "Paid by",
   splitAmongLabel: "Split among",
   splitAmongRequired: "Select at least one member",

@@ -1,7 +1,7 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { ADD_EXPENSE_COPY } from "./AddExpenseForm.copy";
+import { ADD_EXPENSE_COPY } from "./AddExpenseFormView.copy";
 import { AddExpenseFormView } from "./AddExpenseFormView";
 
 const copy = ADD_EXPENSE_COPY;
@@ -12,6 +12,8 @@ const members = [
 ];
 
 describe("AddExpenseFormView", () => {
+  afterEach(cleanup);
+
   it("renders the form title and subtitle", () => {
     render(
       <AddExpenseFormView
@@ -91,11 +93,32 @@ describe("AddExpenseFormView", () => {
     expect(screen.getByText(copy.amountInvalid)).toBeDefined();
   });
 
-  it("shows split among required error when no members are in the trip", () => {
+  it("shows amount invalid error for partial string input", () => {
     render(
       <AddExpenseFormView
         isPending={false}
-        members={[]}
+        members={members}
+        onSubmit={vi.fn()}
+        tripId="trip-1"
+      />,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText(copy.descriptionPlaceholder), {
+      target: { value: "Dinner" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(copy.amountPlaceholder), {
+      target: { value: "10abc" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: copy.submitButton }));
+
+    expect(screen.getByText(copy.amountInvalid)).toBeDefined();
+  });
+
+  it("shows split among required error when all members are unchecked", () => {
+    render(
+      <AddExpenseFormView
+        isPending={false}
+        members={members}
         onSubmit={vi.fn()}
         tripId="trip-1"
       />,
@@ -107,11 +130,29 @@ describe("AddExpenseFormView", () => {
     fireEvent.change(screen.getByPlaceholderText(copy.amountPlaceholder), {
       target: { value: "10" },
     });
+    screen.getAllByRole("checkbox").forEach((cb) => fireEvent.click(cb));
     fireEvent.submit(
       screen.getByRole("button", { name: copy.submitButton }).closest("form")!,
     );
 
     expect(screen.getByText(copy.splitAmongRequired)).toBeDefined();
+  });
+
+  it("disables submit and shows empty state when no members exist", () => {
+    render(
+      <AddExpenseFormView
+        isPending={false}
+        members={[]}
+        onSubmit={vi.fn()}
+        tripId="trip-1"
+      />,
+    );
+
+    expect(screen.getByText(copy.noMembersEmptyState)).toBeDefined();
+    const button = screen
+      .getByRole("button", { name: copy.submitButton })
+      .closest("button");
+    expect(button!.disabled).toBe(true);
   });
 
   it("calls onSubmit with correct cents and data when valid", () => {

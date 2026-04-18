@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/components/auth";
 import { useAddExpenseMutation, useMembers } from "@/lib/hooks";
-import { ADD_EXPENSE_COPY } from "./AddExpenseForm.copy";
+import { ADD_EXPENSE_COPY } from "./AddExpenseFormView.copy";
 import { AddExpenseFormView } from "./AddExpenseFormView";
 
 interface AddExpenseContentProps {
