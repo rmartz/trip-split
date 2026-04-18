@@ -1,12 +1,10 @@
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 
 import type { Expense } from "@/types";
 
 import { EXPENSE_CARD_COPY } from "./ExpenseCard.copy";
 import { ExpenseCard } from "./ExpenseCard";
-
-afterEach(cleanup);
 
 function makeExpense(overrides?: Partial<Expense>): Expense {
   return {

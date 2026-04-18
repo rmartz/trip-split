@@ -1,5 +1,3 @@
-"use client";
-
 import type { Expense, TripMember } from "@/types";
 
 import { ExpenseCard } from "./ExpenseCard";
