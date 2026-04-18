@@ -7,6 +7,7 @@ export const TRIP_DETAIL_COPY = {
   deletingTrip: "Deleting\u2026",
   loading: "Loading trip\u2026",
   memberNameRequired: "Member name is required.",
+  expenses: "Expenses",
   members: "Members",
   notFound: "Trip not found.",
 } as const;

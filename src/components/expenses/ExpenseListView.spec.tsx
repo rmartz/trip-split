@@ -35,12 +35,6 @@ function makeMember(
 }
 
 describe("ExpenseListView", () => {
-  it("renders the expenses heading", () => {
-    render(<ExpenseListView expenses={[]} isLoading={false} members={[]} />);
-
-    expect(screen.getByText(EXPENSE_LIST_VIEW_COPY.expenses)).toBeDefined();
-  });
-
   it("shows empty state when no expenses", () => {
     render(<ExpenseListView expenses={[]} isLoading={false} members={[]} />);
 

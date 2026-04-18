@@ -66,11 +66,14 @@ export function TripDetailView({
         </div>
       </div>
       <div className="mt-8">
-        <ExpenseListView
-          expenses={expenses}
-          isLoading={isExpensesLoading}
-          members={members}
-        />
+        <h2 className="text-lg font-medium">{TRIP_DETAIL_COPY.expenses}</h2>
+        <div className="mt-3">
+          <ExpenseListView
+            expenses={expenses}
+            isLoading={isExpensesLoading}
+            members={members}
+          />
+        </div>
       </div>
     </div>
   );
