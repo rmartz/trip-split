@@ -27,7 +27,7 @@ Trip Split is a Next.js web app for splitting trip expenses among friends.
 - **UI components:** ShadCN UI. Do not install other component libraries.
 - **Styling:** Tailwind CSS (comes with ShadCN). No CSS modules or styled-components.
 - **State (server):** TanStack Query for async mutations and server state.
-- **Database:** Firebase Firestore. Store monetary values as integers (cents), never floats.
+- **Database:** Firebase Realtime Database. Store monetary values as integers (cents), never floats.
 - **Auth:** Firebase Authentication (client SDK).
 - **Hosting:** Vercel.
 
@@ -52,8 +52,8 @@ src/
 ## File Organization
 
 - **Source files**: Keep under ~200 lines (split at ~240). Large files should be split by logical concern.
-- **Test files**: Keep under ~300 lines (split at ~360). When splitting, organize into a `{module}-tests/` directory with domain-specific files.
-- **Components**: Each component file must contain exactly one component and its associated props interface. Delegate complex logic to utility functions or sub-components.
+- **Test files**: Keep under ~300 lines (split at ~360). Use `.spec.ts` / `.spec.tsx` extension. When splitting, organize into a `{module}-tests/` directory with domain-specific files.
+- **Components**: A component file contains its primary component and props interface. A sub-component may be co-located in the same file if it owns no hooks, state, effects, or context, and is used only by the parent component in that file. A sub-component must be in its own file when any of these are true: it owns hooks, state, effects, or context; it is referenced from multiple parents; or it is substantial enough to warrant its own stories or tests. All component props must be defined as an explicitly named interface (e.g., `interface TripCardProps`), never inline in the function signature.
 - **Type files**: Convert large type files into barrel-exported directories with one file per logical domain.
 - **Utility files**: Split by the type of operation or domain they serve.
 - **Service files**: Extract complex logic areas into focused utility functions or smaller services.
@@ -62,9 +62,22 @@ src/
 
 ## Code Conventions
 
-- **No spurious variables.** Do not assign a value to a variable only to immediately return it on the next line -- return the expression directly instead.
+- **Favor type inference.** Explicit generic type arguments (e.g., `someFn<Foo>(...)`) are a code smell when TypeScript can infer them.
+- **No spurious variables.** Do not assign a value to a variable only to immediately return it on the next line — return the expression directly instead.
+- **No IIFEs.** Do not use immediately-invoked function expressions. Extract the logic into a named helper function or compute the value with a plain expression instead.
+- **No function-style imports.** Do not use inline `import("…").Type` syntax in type annotations. Use module-level `import type { … } from "…"` statements at the top of the file.
+- **No unnecessary helpers.** Do not extract logic into a helper function unless it separates significant logic or belongs in a different module.
+- **Prefer enums over string literal unions** for any domain concept with two or more named states (e.g., use `enum SplitType { Equal = "equal", Itemized = "itemized" }` rather than `"equal" | "itemized"`). String enum values must match existing serialized literals so Firebase data round-trips without migration.
 - **Enums and constant objects** should be kept in alphabetical order to minimize merge conflicts.
 - Format currency using the `formatCurrency` utility, never manually.
+
+## Backwards Compatibility
+
+Trip Split stores user data persistently in Firebase. Once the app reaches MVP with real users, schema changes require a migration path.
+
+- Never rename or remove Firebase fields without a migration. Prefer additive changes (new optional fields) over renames or removals.
+- String enum values must match existing serialized literals exactly — changing an enum value is a breaking schema change.
+- Mark breaking changes with a `feat!:` PR title so they are visible in the squash-merge commit history.
 
 ## Naming Conventions
 
@@ -88,12 +101,11 @@ src/
 ### Client Components
 
 - `"use client"` directive required on all React client components (Next.js App Router).
-- React hooks must be called unconditionally -- hooks before any early returns.
+- React hooks must be called unconditionally — hooks before any early returns.
 
 ### JSX
 
-- **No imperative logic inside JSX.** All conditional logic and variable declarations must be computed in the component body before the `return` statement, or extracted into a dedicated child component. Simple functional expressions are fine in JSX -- inline arrow functions, ternaries, and `.map()` calls that return JSX directly are all permitted. What is prohibited is multi-statement blocks: declaring intermediate variables and then returning a value inside JSX.
-- JSX should only contain simple functional expressions: `items.map(item => <Item key={item.id} {...item} />)`.
+- **No imperative logic inside JSX.** Imperative logic means anything that requires a statement rather than an expression: `const`/`let` declarations, `if`/`switch` blocks, loops, or any sequence of statements that produces a result through side effects. All such logic must live in the component body before the `return` statement, or be extracted into a child component. Expressions of any complexity are permitted directly in JSX — ternaries, logical operators (`&&`, `||`, `??`), method chains (`.map()`, `.filter()`, `.find()`), nested function calls, and template literals are all fine as long as they form a single expression with no intermediate bindings.
 
 ### Component Structure
 
@@ -103,7 +115,7 @@ src/
 
 - Story files are co-located with their component: `ComponentName.stories.tsx`.
 - When adding or modifying a UI component, add or update its Storybook story to cover key visual states.
-- Stories should use mock data fixtures -- never import from Firebase or depend on runtime providers (QueryClient, AuthProvider, Next.js router).
+- Stories should use mock data fixtures — never import from Firebase or depend on runtime providers (QueryClient, AuthProvider, Next.js router).
 - Components that are too hook-dependent to render in isolation should use a presentational split: extract rendering into a `ComponentNameView` that accepts callbacks, and keep the original as a thin wrapper that wires up hooks.
 
 ## Component Tests
@@ -111,7 +123,7 @@ src/
 - Test files are co-located with their component: `ComponentName.spec.tsx`.
 - When adding or modifying a UI component, add or update its test to verify rendering behavior and key prop-driven states.
 - Use `@testing-library/react` with `vitest`. Always call `afterEach(cleanup)`.
-- Do not use `.toBeInTheDocument()` -- use `.toBeDefined()` or check `.textContent` instead.
+- Do not use `.toBeInTheDocument()` — use `.toBeDefined()` or check `.textContent` instead.
 - Assert against copy constants rather than hardcoded strings.
 - Test presentational view components directly; avoid mocking hooks in tests where possible.
 
@@ -123,11 +135,20 @@ src/
 - Unit test business logic (especially balance calculations) with Vitest.
 - Use the Firebase emulator for integration tests.
 
+### Test Design
+
+- **Control inputs and outputs.** Do not rely on a function's default return values as the assertion of a test unless the purpose of the test is specifically to verify those defaults. Use explicit, non-default values so a passing test proves the value was produced by logic, not inherited from an initializer.
+- **One reason to fail per test.** Each test should assert a single logical outcome. If a test invokes two functions from the codebase it should be explicitly testing how those two interact. Incidental coverage of a second function is not a reason to combine assertions.
+- **Keep tests simple.** A failing test should make it immediately obvious whether the failure is a bug or an intentional change in behavior. If understanding a failure requires reading more than one layer of test setup or multiple assertions, split the test.
+- **Granularity scales with level of abstraction.** Low-level functions (pure utilities, serializers) warrant thorough edge-case coverage. High-level functions (service orchestration, mutations) should have smoke tests that verify they correctly apply the lower-level logic — not re-test every edge case that belongs in the lower-level tests.
+
 ## Git Conventions
 
-- Branch names: lowercase with hyphens, prefixed by type: `feat/`, `chore/`, `refactor/`, `fix/`, `docs/`.
-- Commit messages: conventional commits (`feat:`, `fix:`, `chore:`, `refactor:`, `docs:`).
+- Branch names: lowercase with hyphens, prefixed by type and suffixed with issue number: `feat/`, `chore/`, `refactor/`, `fix/`, `docs/` (e.g., `feat/add-expense-15`).
+- Commit messages within a branch: imperative verbs, no Conventional Commits prefix (e.g., `Add expense form validation`, `Fix member count display`). Individual commits should read clearly on their own — `feat:` prefixes add noise when reviewing a PR's commit list.
+- PR titles must follow Conventional Commits format: `<type>: description` (e.g., `feat: add expense form`). PRs are squash-merged, so the PR title becomes the single commit on main. Valid types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `style`, `perf`, `ci`, `build`, `revert`. Use `feat!:` for breaking schema changes.
+- PR descriptions must use `Closes #123`, `Fixes #123`, or `Resolves #123` to trigger GitHub's automatic issue close on merge.
 
 ## Documentation
 
-- Keep documentation in sync with the code -- outdated docs are worse than no docs.
+- Keep documentation in sync with the code — outdated docs are worse than no docs.
