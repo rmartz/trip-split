@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { fn } from "storybook/test";
 
-import type { Trip, TripMember } from "@/types";
+import type { Expense, Trip, TripMember } from "@/types";
 import { TripDetailView } from "./TripDetailView";
 
 function makeTrip(overrides?: Partial<Trip>): Trip {
@@ -25,6 +25,22 @@ function makeMember(
   };
 }
 
+function makeExpense(overrides?: Partial<Expense>): Expense {
+  return {
+    createdAt: new Date("2026-03-15T10:00:00Z"),
+    createdBy: "user-1",
+    currency: "USD",
+    description: "Dinner",
+    id: "expense-1",
+    paidByMemberId: "m1",
+    splitAmong: ["m1", "m2"],
+    splitType: "equal",
+    totalAmountCents: 12050,
+    updatedAt: new Date("2026-03-15T10:00:00Z"),
+    ...overrides,
+  };
+}
+
 const meta = {
   title: "Pages/TripDetailView",
   component: TripDetailView,
@@ -38,9 +54,11 @@ type Story = StoryObj<typeof meta>;
 
 export const AsCreator: Story = {
   args: {
+    expenses: [makeExpense()],
     isAddingMember: false,
     isCreator: true,
     isDeletingTrip: false,
+    isExpensesLoading: false,
     members: [
       makeMember({ id: "m1", name: "Alice", userId: "user-1" }),
       makeMember({ id: "m2", name: "Bob", userId: "user-2" }),
@@ -54,9 +72,11 @@ export const AsCreator: Story = {
 
 export const AsMember: Story = {
   args: {
+    expenses: [makeExpense()],
     isAddingMember: false,
     isCreator: false,
     isDeletingTrip: false,
+    isExpensesLoading: false,
     members: [
       makeMember({ id: "m1", name: "Alice", userId: "user-1" }),
       makeMember({ id: "m2", name: "Bob", userId: "user-2" }),
@@ -69,9 +89,11 @@ export const AsMember: Story = {
 
 export const NoDescription: Story = {
   args: {
+    expenses: [],
     isAddingMember: false,
     isCreator: true,
     isDeletingTrip: false,
+    isExpensesLoading: false,
     members: [makeMember({ id: "m1", name: "Alice", userId: "user-1" })],
     onAddMember: fn(),
     onDeleteTrip: fn(),
@@ -81,9 +103,25 @@ export const NoDescription: Story = {
 
 export const AddingMember: Story = {
   args: {
+    expenses: [],
     isAddingMember: true,
     isCreator: true,
     isDeletingTrip: false,
+    isExpensesLoading: false,
+    members: [makeMember({ id: "m1", name: "Alice", userId: "user-1" })],
+    onAddMember: fn(),
+    onDeleteTrip: fn(),
+    trip: makeTrip(),
+  },
+};
+
+export const ExpensesLoading: Story = {
+  args: {
+    expenses: [],
+    isAddingMember: false,
+    isCreator: true,
+    isDeletingTrip: false,
+    isExpensesLoading: true,
     members: [makeMember({ id: "m1", name: "Alice", userId: "user-1" })],
     onAddMember: fn(),
     onDeleteTrip: fn(),

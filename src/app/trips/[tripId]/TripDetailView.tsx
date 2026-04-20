@@ -3,15 +3,18 @@
 import Link from "next/link";
 
 import { Button, buttonVariants } from "@/components/ui/button";
-import type { Trip, TripMember } from "@/types";
+import { ExpenseListView } from "@/components/expenses";
+import type { Expense, Trip, TripMember } from "@/types";
 import { AddMemberForm } from "./AddMemberForm";
 import { MemberList } from "./MemberList";
 import { TRIP_DETAIL_COPY } from "./TripDetail.copy";
 
 interface TripDetailViewProps {
+  expenses: Expense[];
   isAddingMember: boolean;
   isCreator: boolean;
   isDeletingTrip: boolean;
+  isExpensesLoading: boolean;
   members: TripMember[];
   onAddMember: (name: string) => void;
   onDeleteTrip: () => void;
@@ -19,9 +22,11 @@ interface TripDetailViewProps {
 }
 
 export function TripDetailView({
+  expenses,
   isAddingMember,
   isCreator,
   isDeletingTrip,
+  isExpensesLoading,
   members,
   onAddMember,
   onDeleteTrip,
@@ -64,6 +69,13 @@ export function TripDetailView({
           >
             {TRIP_DETAIL_COPY.addExpense}
           </Link>
+        </div>
+        <div className="mt-3">
+          <ExpenseListView
+            expenses={expenses}
+            isLoading={isExpensesLoading}
+            members={members}
+          />
         </div>
       </div>
       <div className="mt-8">

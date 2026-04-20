@@ -4,6 +4,7 @@ import { useAuth } from "@/components/auth";
 import {
   useAddMemberMutation,
   useDeleteTripMutation,
+  useExpenses,
   useMembers,
   useTrip,
 } from "@/lib/hooks";
@@ -18,6 +19,7 @@ export function TripDetailContent({ tripId }: TripDetailContentProps) {
   const { user } = useAuth();
   const { data: trip, isLoading: isTripLoading } = useTrip(tripId);
   const { data: members } = useMembers(tripId);
+  const { data: expenses, isLoading: isExpensesLoading } = useExpenses(tripId);
   const addMemberMutation = useAddMemberMutation();
   const deleteTripMutation = useDeleteTripMutation();
 
@@ -39,9 +41,11 @@ export function TripDetailContent({ tripId }: TripDetailContentProps) {
 
   return (
     <TripDetailView
+      expenses={expenses ?? []}
       isAddingMember={addMemberMutation.isPending}
       isCreator={user?.uid === trip.createdBy}
       isDeletingTrip={deleteTripMutation.isPending}
+      isExpensesLoading={isExpensesLoading}
       members={members ?? []}
       onAddMember={(name) => {
         if (!user) return;
