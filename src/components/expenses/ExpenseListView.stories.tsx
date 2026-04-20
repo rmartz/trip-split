@@ -77,6 +77,7 @@ export const WithExpenses: Story = {
     ],
     isLoading: false,
     members,
+    tripId: "trip-1",
   },
 };
 
@@ -85,6 +86,7 @@ export const Empty: Story = {
     expenses: [],
     isLoading: false,
     members,
+    tripId: "trip-1",
   },
 };
 
@@ -93,5 +95,6 @@ export const Loading: Story = {
     expenses: [],
     isLoading: true,
     members,
+    tripId: "trip-1",
   },
 };

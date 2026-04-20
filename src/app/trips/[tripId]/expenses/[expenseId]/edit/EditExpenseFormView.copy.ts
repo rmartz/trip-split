@@ -1,0 +1,18 @@
+export const EDIT_EXPENSE_COPY = {
+  addingButton: "Saving\u2026",
+  amountInvalid: "Enter a positive amount",
+  amountLabel: "Amount",
+  amountPlaceholder: "0.00",
+  cancelButton: "Cancel",
+  descriptionLabel: "Description",
+  descriptionPlaceholder: "e.g. Dinner, Hotel, Taxi",
+  descriptionRequired: "Description is required",
+  loading: "Loading\u2026",
+  notFound: "Expense not found.",
+  paidByLabel: "Paid by",
+  splitAmongLabel: "Split among",
+  splitAmongRequired: "Select at least one member",
+  submitButton: "Save Changes",
+  subtitle: "Update the details of this expense",
+  title: "Edit Expense",
+} as const;

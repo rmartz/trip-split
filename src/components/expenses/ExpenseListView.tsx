@@ -4,15 +4,23 @@ import { ExpenseCard } from "./ExpenseCard";
 import { EXPENSE_LIST_VIEW_COPY } from "./ExpenseListView.copy";
 
 interface ExpenseListViewProps {
+  currentUserId?: string;
   expenses: Expense[];
   isLoading: boolean;
   members: TripMember[];
+  onDeleteExpense?: (expenseId: string) => void;
+  tripCreatorId?: string;
+  tripId: string;
 }
 
 export function ExpenseListView({
+  currentUserId,
   expenses,
   isLoading,
   members,
+  onDeleteExpense,
+  tripCreatorId,
+  tripId,
 }: ExpenseListViewProps) {
   const memberMap = Object.fromEntries(members.map((m) => [m.id, m.name]));
   const sortedExpenses = [...expenses].sort(
@@ -32,15 +40,31 @@ export function ExpenseListView({
           {EXPENSE_LIST_VIEW_COPY.emptyState}
         </p>
       ) : (
-        sortedExpenses.map((expense) => (
-          <ExpenseCard
-            key={expense.id}
-            expense={expense}
-            paidByName={
-              memberMap[expense.paidByMemberId] ?? expense.paidByMemberId
-            }
-          />
-        ))
+        sortedExpenses.map((expense) => {
+          const canEdit =
+            !!currentUserId &&
+            (expense.createdBy === currentUserId ||
+              tripCreatorId === currentUserId);
+
+          return (
+            <ExpenseCard
+              key={expense.id}
+              canEdit={canEdit}
+              expense={expense}
+              onDelete={
+                canEdit && onDeleteExpense
+                  ? () => {
+                      onDeleteExpense(expense.id);
+                    }
+                  : undefined
+              }
+              paidByName={
+                memberMap[expense.paidByMemberId] ?? expense.paidByMemberId
+              }
+              tripId={tripId}
+            />
+          );
+        })
       )}
     </div>
   );

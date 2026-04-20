@@ -34,7 +34,14 @@ function makeMember(
 
 describe("ExpenseListView", () => {
   it("shows empty state when no expenses", () => {
-    render(<ExpenseListView expenses={[]} isLoading={false} members={[]} />);
+    render(
+      <ExpenseListView
+        expenses={[]}
+        isLoading={false}
+        members={[]}
+        tripId="trip-1"
+      />,
+    );
 
     expect(screen.getByText(EXPENSE_LIST_VIEW_COPY.emptyState)).toBeDefined();
   });
@@ -45,6 +52,7 @@ describe("ExpenseListView", () => {
         expenses={[makeExpense()]}
         isLoading={false}
         members={[makeMember({ id: "member-1", name: "Alice" })]}
+        tripId="trip-1"
       />,
     );
 
@@ -57,6 +65,7 @@ describe("ExpenseListView", () => {
         expenses={[makeExpense({ description: "Hotel" })]}
         isLoading={false}
         members={[makeMember({ id: "member-1", name: "Alice" })]}
+        tripId="trip-1"
       />,
     );
 
@@ -69,6 +78,7 @@ describe("ExpenseListView", () => {
         expenses={[makeExpense({ paidByMemberId: "member-1" })]}
         isLoading={false}
         members={[makeMember({ id: "member-1", name: "Alice" })]}
+        tripId="trip-1"
       />,
     );
 
@@ -81,6 +91,7 @@ describe("ExpenseListView", () => {
         expenses={[makeExpense({ paidByMemberId: "unknown-id" })]}
         isLoading={false}
         members={[]}
+        tripId="trip-1"
       />,
     );
 
@@ -104,6 +115,7 @@ describe("ExpenseListView", () => {
         expenses={[older, newer]}
         isLoading={false}
         members={[makeMember({ id: "member-1", name: "Alice" })]}
+        tripId="trip-1"
       />,
     );
 
@@ -113,7 +125,14 @@ describe("ExpenseListView", () => {
   });
 
   it("does not show empty state while loading", () => {
-    render(<ExpenseListView expenses={[]} isLoading={true} members={[]} />);
+    render(
+      <ExpenseListView
+        expenses={[]}
+        isLoading={true}
+        members={[]}
+        tripId="trip-1"
+      />,
+    );
 
     expect(screen.queryByText(EXPENSE_LIST_VIEW_COPY.emptyState)).toBeNull();
   });
