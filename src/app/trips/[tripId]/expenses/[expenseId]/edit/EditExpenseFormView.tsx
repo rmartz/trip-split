@@ -38,10 +38,9 @@ export function EditExpenseFormView({
   onSubmit,
   tripId,
 }: EditExpenseFormViewProps) {
+  const dollars = expense.totalAmountCents / 100;
   const initialAmount =
-    expense.totalAmountCents % 100 === 0
-      ? String(expense.totalAmountCents / 100)
-      : (expense.totalAmountCents / 100).toFixed(2);
+    expense.totalAmountCents % 100 === 0 ? String(dollars) : dollars.toFixed(2);
 
   const [description, setDescription] = useState(expense.description);
   const [amount, setAmount] = useState(initialAmount);
@@ -74,10 +73,13 @@ export function EditExpenseFormView({
       setValidationError(EDIT_EXPENSE_COPY.amountInvalid);
       return;
     }
-    const [intStr, fracStr] = trimmedAmount.split(".");
+    const [intStr, fracStr] = trimmedAmount.split(".") as [
+      string,
+      string | undefined,
+    ];
     const totalCents =
       parseInt(intStr, 10) * 100 +
-      (trimmedAmount.includes(".") ? parseInt(fracStr.padEnd(2, "0"), 10) : 0);
+      (fracStr !== undefined ? parseInt(fracStr.padEnd(2, "0"), 10) : 0);
     if (totalCents <= 0) {
       setValidationError(EDIT_EXPENSE_COPY.amountInvalid);
       return;
