@@ -45,19 +45,19 @@ export function ExpenseListView({
             !!currentUserId &&
             (expense.createdBy === currentUserId ||
               tripCreatorId === currentUserId);
+          const handleDelete =
+            canEdit && onDeleteExpense
+              ? () => {
+                  onDeleteExpense(expense.id);
+                }
+              : undefined;
 
           return (
             <ExpenseCard
               key={expense.id}
               canEdit={canEdit}
               expense={expense}
-              onDelete={
-                canEdit && onDeleteExpense
-                  ? () => {
-                      onDeleteExpense(expense.id);
-                    }
-                  : undefined
-              }
+              onDelete={handleDelete}
               paidByName={
                 memberMap[expense.paidByMemberId] ?? expense.paidByMemberId
               }

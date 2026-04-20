@@ -16,8 +16,6 @@ import { Label } from "@/components/ui/label";
 import type { Expense, TripMember } from "@/types";
 import { EDIT_EXPENSE_COPY } from "./EditExpenseFormView.copy";
 
-const copy = EDIT_EXPENSE_COPY;
-
 interface EditExpenseFormViewProps {
   error?: string;
   expense: Expense;
@@ -66,27 +64,27 @@ export function EditExpenseFormView({
     setValidationError(undefined);
 
     if (!description.trim()) {
-      setValidationError(copy.descriptionRequired);
+      setValidationError(EDIT_EXPENSE_COPY.descriptionRequired);
       return;
     }
 
+    const trimmedAmount = amount.trim();
     const amountRegex = /^\d+(\.\d{1,2})?$/;
-    if (!amountRegex.test(amount.trim())) {
-      setValidationError(copy.amountInvalid);
+    if (!amountRegex.test(trimmedAmount)) {
+      setValidationError(EDIT_EXPENSE_COPY.amountInvalid);
       return;
     }
-    const trimmed = amount.trim();
-    const [intStr, fracStr] = trimmed.split(".");
+    const [intStr, fracStr] = trimmedAmount.split(".");
     const totalCents =
       parseInt(intStr, 10) * 100 +
-      (trimmed.includes(".") ? parseInt(fracStr.padEnd(2, "0"), 10) : 0);
+      (trimmedAmount.includes(".") ? parseInt(fracStr.padEnd(2, "0"), 10) : 0);
     if (totalCents <= 0) {
-      setValidationError(copy.amountInvalid);
+      setValidationError(EDIT_EXPENSE_COPY.amountInvalid);
       return;
     }
 
     if (splitAmong.length === 0) {
-      setValidationError(copy.splitAmongRequired);
+      setValidationError(EDIT_EXPENSE_COPY.splitAmongRequired);
       return;
     }
 
@@ -99,18 +97,18 @@ export function EditExpenseFormView({
     <div className="mx-auto w-full max-w-lg px-4 py-8">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>{copy.title}</CardTitle>
-          <CardDescription>{copy.subtitle}</CardDescription>
+          <CardTitle>{EDIT_EXPENSE_COPY.title}</CardTitle>
+          <CardDescription>{EDIT_EXPENSE_COPY.subtitle}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="expense-description">
-                {copy.descriptionLabel}
+                {EDIT_EXPENSE_COPY.descriptionLabel}
               </Label>
               <Input
                 id="expense-description"
-                placeholder={copy.descriptionPlaceholder}
+                placeholder={EDIT_EXPENSE_COPY.descriptionPlaceholder}
                 value={description}
                 onChange={(e) => {
                   setDescription(e.target.value);
@@ -120,12 +118,14 @@ export function EditExpenseFormView({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="expense-amount">{copy.amountLabel}</Label>
+              <Label htmlFor="expense-amount">
+                {EDIT_EXPENSE_COPY.amountLabel}
+              </Label>
               <Input
                 id="expense-amount"
                 type="text"
                 inputMode="decimal"
-                placeholder={copy.amountPlaceholder}
+                placeholder={EDIT_EXPENSE_COPY.amountPlaceholder}
                 value={amount}
                 onChange={(e) => {
                   setAmount(e.target.value);
@@ -134,7 +134,9 @@ export function EditExpenseFormView({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="expense-paid-by">{copy.paidByLabel}</Label>
+              <Label htmlFor="expense-paid-by">
+                {EDIT_EXPENSE_COPY.paidByLabel}
+              </Label>
               <select
                 id="expense-paid-by"
                 value={paidByMemberId}
@@ -151,7 +153,7 @@ export function EditExpenseFormView({
               </select>
             </div>
             <div className="space-y-2">
-              <Label>{copy.splitAmongLabel}</Label>
+              <Label>{EDIT_EXPENSE_COPY.splitAmongLabel}</Label>
               <div className="space-y-1.5">
                 {members.map((member) => (
                   <label
@@ -178,13 +180,15 @@ export function EditExpenseFormView({
             )}
             <div className="flex gap-2">
               <Button type="submit" className="flex-1" disabled={isPending}>
-                {isPending ? copy.addingButton : copy.submitButton}
+                {isPending
+                  ? EDIT_EXPENSE_COPY.addingButton
+                  : EDIT_EXPENSE_COPY.submitButton}
               </Button>
               <Link
                 href={`/trips/${tripId}`}
                 className={buttonVariants({ variant: "outline" })}
               >
-                {copy.cancelButton}
+                {EDIT_EXPENSE_COPY.cancelButton}
               </Link>
             </div>
           </form>
