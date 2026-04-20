@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-import { signIn, signUp } from "@/lib/auth";
+import { signIn, signInWithGoogle, signUp } from "@/lib/auth";
 
 interface AuthCredentials {
   email: string;
@@ -26,6 +26,17 @@ export function useSignUpMutation() {
   return useMutation({
     mutationFn: ({ email, password }: AuthCredentials) =>
       signUp(email, password),
+    onSuccess: () => {
+      router.push("/dashboard");
+    },
+  });
+}
+
+export function useSignInWithGoogleMutation() {
+  const router = useRouter();
+
+  return useMutation({
+    mutationFn: () => signInWithGoogle(),
     onSuccess: () => {
       router.push("/dashboard");
     },

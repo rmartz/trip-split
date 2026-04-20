@@ -1,12 +1,15 @@
 import { AUTH_COPY } from "@/constants/copy";
 
 const FIREBASE_ERROR_MAP: Record<string, string> = {
-  "auth/wrong-password": AUTH_COPY.errors.invalidCredential,
-  "auth/invalid-credential": AUTH_COPY.errors.invalidCredential,
-  "auth/user-not-found": AUTH_COPY.errors.invalidCredential,
+  "auth/account-exists-with-different-credential":
+    AUTH_COPY.errors.accountExistsWithDifferentCredential,
   "auth/email-already-in-use": AUTH_COPY.errors.emailAlreadyInUse,
-  "auth/too-many-requests": AUTH_COPY.errors.tooManyRequests,
+  "auth/invalid-credential": AUTH_COPY.errors.invalidCredential,
   "auth/network-request-failed": AUTH_COPY.errors.networkError,
+  "auth/popup-closed-by-user": AUTH_COPY.errors.popupClosedByUser,
+  "auth/too-many-requests": AUTH_COPY.errors.tooManyRequests,
+  "auth/user-not-found": AUTH_COPY.errors.invalidCredential,
+  "auth/wrong-password": AUTH_COPY.errors.invalidCredential,
 };
 
 export function getAuthErrorMessage(error: unknown): string {
