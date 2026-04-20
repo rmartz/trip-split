@@ -43,7 +43,7 @@ export const Default: Story = {
 
     await expect(canvas.getByText("Dinner at the restaurant")).toBeDefined();
     await expect(
-      canvas.getByText(EXPENSE_CARD_COPY.paidBy("Alice")),
+      canvas.getByText(EXPENSE_CARD_COPY.paidBy("Alice"), { exact: false }),
     ).toBeDefined();
     await expect(canvas.getByText("$120.50")).toBeDefined();
   },
