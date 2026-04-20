@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { fn } from "storybook/test";
+import { expect, fn, userEvent, within } from "storybook/test";
 
+import { ADD_EXPENSE_COPY } from "./AddExpenseFormView.copy";
 import { AddExpenseFormView } from "./AddExpenseFormView";
 
 const members = [
@@ -58,5 +59,45 @@ export const Pending: Story = {
 export const WithServerError: Story = {
   args: {
     error: "Failed to save expense. Please try again.",
+  },
+};
+
+export const ShowsValidationErrorOnEmptySubmit: Story = {
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: ADD_EXPENSE_COPY.submitButton }),
+    );
+
+    await expect(canvas.getByRole("alert").textContent).toBe(
+      ADD_EXPENSE_COPY.descriptionRequired,
+    );
+    await expect(args.onSubmit).not.toHaveBeenCalled();
+  },
+};
+
+export const SubmitsWithValidInput: Story = {
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.type(
+      canvas.getByLabelText(ADD_EXPENSE_COPY.descriptionLabel),
+      "Dinner at the restaurant",
+    );
+    await userEvent.type(
+      canvas.getByLabelText(ADD_EXPENSE_COPY.amountLabel),
+      "120.50",
+    );
+    await userEvent.click(
+      canvas.getByRole("button", { name: ADD_EXPENSE_COPY.submitButton }),
+    );
+
+    await expect(args.onSubmit).toHaveBeenCalledWith(
+      "Dinner at the restaurant",
+      12050,
+      "member-1",
+      ["member-1", "member-2", "member-3"],
+    );
   },
 };
