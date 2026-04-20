@@ -27,6 +27,19 @@ export function ExpenseListView({
     (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
   );
 
+  const expenseRows = sortedExpenses.map((expense) => {
+    const canEdit =
+      !!currentUserId &&
+      (expense.createdBy === currentUserId || tripCreatorId === currentUserId);
+    const handleDelete =
+      canEdit && onDeleteExpense
+        ? () => {
+            onDeleteExpense(expense.id);
+          }
+        : undefined;
+    return { expense, canEdit, handleDelete };
+  });
+
   return (
     <div className="space-y-2">
       {isLoading ? (
@@ -35,36 +48,23 @@ export function ExpenseListView({
           <div className="bg-muted h-14 animate-pulse rounded-md" />
           <div className="bg-muted h-14 animate-pulse rounded-md" />
         </>
-      ) : sortedExpenses.length === 0 ? (
+      ) : expenseRows.length === 0 ? (
         <p className="text-muted-foreground text-sm">
           {EXPENSE_LIST_VIEW_COPY.emptyState}
         </p>
       ) : (
-        sortedExpenses.map((expense) => {
-          const canEdit =
-            !!currentUserId &&
-            (expense.createdBy === currentUserId ||
-              tripCreatorId === currentUserId);
-          const handleDelete =
-            canEdit && onDeleteExpense
-              ? () => {
-                  onDeleteExpense(expense.id);
-                }
-              : undefined;
-
-          return (
-            <ExpenseCard
-              key={expense.id}
-              canEdit={canEdit}
-              expense={expense}
-              onDelete={handleDelete}
-              paidByName={
-                memberMap[expense.paidByMemberId] ?? expense.paidByMemberId
-              }
-              tripId={tripId}
-            />
-          );
-        })
+        expenseRows.map(({ expense, canEdit, handleDelete }) => (
+          <ExpenseCard
+            key={expense.id}
+            canEdit={canEdit}
+            expense={expense}
+            onDelete={handleDelete}
+            paidByName={
+              memberMap[expense.paidByMemberId] ?? expense.paidByMemberId
+            }
+            tripId={tripId}
+          />
+        ))
       )}
     </div>
   );

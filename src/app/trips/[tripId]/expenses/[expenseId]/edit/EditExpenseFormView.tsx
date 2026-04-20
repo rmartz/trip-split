@@ -181,7 +181,7 @@ export function EditExpenseFormView({
             <div className="flex gap-2">
               <Button type="submit" className="flex-1" disabled={isPending}>
                 {isPending
-                  ? EDIT_EXPENSE_COPY.addingButton
+                  ? EDIT_EXPENSE_COPY.savingButton
                   : EDIT_EXPENSE_COPY.submitButton}
               </Button>
               <Link

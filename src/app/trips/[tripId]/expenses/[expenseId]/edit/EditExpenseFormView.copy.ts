@@ -1,5 +1,4 @@
 export const EDIT_EXPENSE_COPY = {
-  addingButton: "Saving\u2026",
   amountInvalid: "Enter a positive amount",
   amountLabel: "Amount",
   amountPlaceholder: "0.00",
@@ -10,6 +9,7 @@ export const EDIT_EXPENSE_COPY = {
   loading: "Loading\u2026",
   notFound: "Expense not found.",
   paidByLabel: "Paid by",
+  savingButton: "Saving\u2026",
   splitAmongLabel: "Split among",
   splitAmongRequired: "Select at least one member",
   submitButton: "Save Changes",
