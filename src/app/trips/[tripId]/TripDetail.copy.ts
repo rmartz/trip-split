@@ -1,4 +1,5 @@
 export const TRIP_DETAIL_COPY = {
+  addExpense: "Add Expense",
   addMember: "Add",
   addMemberPlaceholder: "Member name",
   confirmDelete:

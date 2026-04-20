@@ -1,6 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
+import { Button, buttonVariants } from "@/components/ui/button";
 import { ExpenseListView } from "@/components/expenses";
 import type { Expense, Trip, TripMember } from "@/types";
 import { AddMemberForm } from "./AddMemberForm";
@@ -59,20 +61,28 @@ export function TripDetailView({
         )}
       </div>
       <div className="mt-8">
-        <h2 className="text-lg font-medium">{TRIP_DETAIL_COPY.members}</h2>
-        <div className="mt-3 space-y-4">
-          <MemberList members={members} />
-          <AddMemberForm isPending={isAddingMember} onAdd={onAddMember} />
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-medium">{TRIP_DETAIL_COPY.expenses}</h2>
+          <Link
+            href={`/trips/${trip.id}/expenses/new`}
+            className={buttonVariants({ size: "sm" })}
+          >
+            {TRIP_DETAIL_COPY.addExpense}
+          </Link>
         </div>
-      </div>
-      <div className="mt-8">
-        <h2 className="text-lg font-medium">{TRIP_DETAIL_COPY.expenses}</h2>
         <div className="mt-3">
           <ExpenseListView
             expenses={expenses}
             isLoading={isExpensesLoading}
             members={members}
           />
+        </div>
+      </div>
+      <div className="mt-8">
+        <h2 className="text-lg font-medium">{TRIP_DETAIL_COPY.members}</h2>
+        <div className="mt-3 space-y-4">
+          <MemberList members={members} />
+          <AddMemberForm isPending={isAddingMember} onAdd={onAddMember} />
         </div>
       </div>
     </div>
