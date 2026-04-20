@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { expect, within } from "storybook/test";
 
 import type { Expense } from "@/types";
 
+import { EXPENSE_CARD_COPY } from "./ExpenseCard.copy";
 import { ExpenseCard } from "./ExpenseCard";
 
 function makeExpense(overrides?: Partial<Expense>): Expense {
@@ -35,6 +37,15 @@ export const Default: Story = {
   args: {
     expense: makeExpense(),
     paidByName: "Alice",
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvas.getByText("Dinner at the restaurant")).toBeDefined();
+    await expect(
+      canvas.getByText(EXPENSE_CARD_COPY.paidBy("Alice")),
+    ).toBeDefined();
+    await expect(canvas.getByText("$120.50")).toBeDefined();
   },
 };
 
