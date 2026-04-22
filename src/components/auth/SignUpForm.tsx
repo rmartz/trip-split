@@ -44,6 +44,7 @@ export function SignUpForm() {
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
     setValidationError(undefined);
+    googleMutation.reset();
 
     const error = validate();
     if (error) {
@@ -81,6 +82,7 @@ export function SignUpForm() {
               onChange={(e) => {
                 setEmail(e.target.value);
                 setValidationError(undefined);
+                googleMutation.reset();
               }}
               autoComplete="email"
             />
@@ -94,6 +96,7 @@ export function SignUpForm() {
               onChange={(e) => {
                 setPassword(e.target.value);
                 setValidationError(undefined);
+                googleMutation.reset();
               }}
               autoComplete="new-password"
             />
@@ -109,6 +112,7 @@ export function SignUpForm() {
               onChange={(e) => {
                 setConfirmPassword(e.target.value);
                 setValidationError(undefined);
+                googleMutation.reset();
               }}
               autoComplete="new-password"
             />
@@ -134,6 +138,8 @@ export function SignUpForm() {
             className="w-full"
             disabled={isPending}
             onClick={() => {
+              mutation.reset();
+              setValidationError(undefined);
               googleMutation.mutate();
             }}
           >
