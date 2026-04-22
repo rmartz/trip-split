@@ -64,9 +64,12 @@ export async function updateExpense(
       Expense,
       | "currency"
       | "description"
+      | "items"
       | "paidByMemberId"
       | "splitAmong"
       | "splitType"
+      | "taxCents"
+      | "tipCents"
       | "totalAmountCents"
     >
   >,

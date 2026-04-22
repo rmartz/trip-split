@@ -1,6 +1,8 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { SplitType } from "@/types";
+
 import { ADD_EXPENSE_COPY } from "./AddExpenseFormView.copy";
 import { AddExpenseFormView } from "./AddExpenseFormView";
 
@@ -155,7 +157,7 @@ describe("AddExpenseFormView", () => {
     expect(button!.disabled).toBe(true);
   });
 
-  it("calls onSubmit with correct cents and data when valid", () => {
+  it("calls onSubmit with correct data for equal split", () => {
     const onSubmit = vi.fn();
     render(
       <AddExpenseFormView
@@ -174,10 +176,13 @@ describe("AddExpenseFormView", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: copy.submitButton }));
 
-    expect(onSubmit).toHaveBeenCalledWith("Dinner", 1050, "member-1", [
-      "member-1",
-      "member-2",
-    ]);
+    expect(onSubmit).toHaveBeenCalledWith({
+      description: "Dinner",
+      paidByMemberId: "member-1",
+      splitAmong: ["member-1", "member-2"],
+      splitType: SplitType.Equal,
+      totalAmountCents: 1050,
+    });
   });
 
   it("disables submit button when pending", () => {
@@ -221,5 +226,115 @@ describe("AddExpenseFormView", () => {
 
     const cancel = screen.getByText(copy.cancelButton);
     expect(cancel.closest("a")?.getAttribute("href")).toBe("/trips/trip-1");
+  });
+
+  describe("itemized split", () => {
+    it("shows itemized form when itemized is selected", () => {
+      render(
+        <AddExpenseFormView
+          isPending={false}
+          members={members}
+          onSubmit={vi.fn()}
+          tripId="trip-1"
+        />,
+      );
+
+      const itemizedRadio = screen.getByRole("radio", {
+        name: copy.itemizedSplitLabel,
+      });
+      fireEvent.click(itemizedRadio);
+
+      expect(screen.getByText(copy.taxLabel)).toBeDefined();
+      expect(screen.getByText(copy.tipLabel)).toBeDefined();
+      expect(
+        screen.getByRole("button", { name: copy.addItemButton }),
+      ).toBeDefined();
+    });
+
+    it("shows mismatch warning when subtotal + tax + tip does not equal total", () => {
+      render(
+        <AddExpenseFormView
+          isPending={false}
+          members={members}
+          onSubmit={vi.fn()}
+          tripId="trip-1"
+        />,
+      );
+
+      fireEvent.change(screen.getByPlaceholderText(copy.amountPlaceholder), {
+        target: { value: "20.00" },
+      });
+      fireEvent.click(
+        screen.getByRole("radio", { name: copy.itemizedSplitLabel }),
+      );
+
+      const itemAmountInputs = screen.getAllByPlaceholderText(
+        copy.itemAmountPlaceholder,
+      );
+      fireEvent.change(itemAmountInputs[0], { target: { value: "5.00" } });
+
+      expect(screen.getByText(copy.itemizedSubtotalMismatch)).toBeDefined();
+    });
+
+    it("calls onSubmit with itemized data when valid", () => {
+      const onSubmit = vi.fn();
+      render(
+        <AddExpenseFormView
+          isPending={false}
+          members={members}
+          onSubmit={onSubmit}
+          tripId="trip-1"
+        />,
+      );
+
+      fireEvent.change(
+        screen.getByPlaceholderText(copy.descriptionPlaceholder),
+        { target: { value: "Dinner" } },
+      );
+      fireEvent.change(screen.getByPlaceholderText(copy.amountPlaceholder), {
+        target: { value: "15.00" },
+      });
+      fireEvent.click(
+        screen.getByRole("radio", { name: copy.itemizedSplitLabel }),
+      );
+
+      const itemDescInputs = screen.getAllByPlaceholderText(
+        copy.itemDescriptionPlaceholder,
+      );
+      fireEvent.change(itemDescInputs[0], { target: { value: "Salad" } });
+
+      const itemAmountInputs = screen.getAllByPlaceholderText(
+        copy.itemAmountPlaceholder,
+      );
+      fireEvent.change(itemAmountInputs[0], { target: { value: "13.00" } });
+
+      // Tax
+      fireEvent.change(screen.getByLabelText(/Tax/), {
+        target: { value: "1.00" },
+      });
+      // Tip
+      fireEvent.change(screen.getByLabelText(/Tip/), {
+        target: { value: "1.00" },
+      });
+
+      fireEvent.click(screen.getByRole("button", { name: copy.submitButton }));
+
+      expect(onSubmit).toHaveBeenCalledWith({
+        description: "Dinner",
+        items: [
+          {
+            amountCents: 1300,
+            assignedTo: ["member-1", "member-2"],
+            description: "Salad",
+          },
+        ],
+        paidByMemberId: "member-1",
+        splitAmong: ["member-1", "member-2"],
+        splitType: SplitType.Itemized,
+        taxCents: 100,
+        tipCents: 100,
+        totalAmountCents: 1500,
+      });
+    });
   });
 });

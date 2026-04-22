@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { fn } from "storybook/test";
 
+import { SplitType } from "@/types";
 import type { Expense, Trip, TripMember } from "@/types";
 import { TripDetailView } from "./TripDetailView";
 
@@ -34,7 +35,7 @@ function makeExpense(overrides?: Partial<Expense>): Expense {
     id: "expense-1",
     paidByMemberId: "m1",
     splitAmong: ["m1", "m2"],
-    splitType: "equal",
+    splitType: SplitType.Equal,
     totalAmountCents: 12050,
     updatedAt: new Date("2026-03-15T10:00:00Z"),
     ...overrides,
