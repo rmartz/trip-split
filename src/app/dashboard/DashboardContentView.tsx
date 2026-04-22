@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { TripCard } from "@/components/trips";
 import { cn } from "@/lib/utils";
 import type { Trip } from "@/types";
@@ -26,7 +27,11 @@ export function DashboardContentView({
         </Link>
       </div>
       {isLoading && (
-        <p className="text-muted-foreground mt-4">{DASHBOARD_COPY.loading}</p>
+        <div className="mt-4 grid gap-3">
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-16 w-full" />
+        </div>
       )}
       {isEmpty && (
         <p className="text-muted-foreground mt-4">{DASHBOARD_COPY.empty}</p>
