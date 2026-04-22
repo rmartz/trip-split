@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 
 import { updateExpense } from "@/services/expenses";
 import type { Expense } from "@/types";
 
 interface UpdateExpenseInput {
   expenseId: string;
+  onSuccess?: () => void;
   tripId: string;
   updates: Partial<
     Pick<
@@ -21,7 +21,6 @@ interface UpdateExpenseInput {
 }
 
 export function useUpdateExpenseMutation() {
-  const router = useRouter();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -31,7 +30,7 @@ export function useUpdateExpenseMutation() {
       void queryClient.invalidateQueries({
         queryKey: ["expenses", variables.tripId],
       });
-      router.push(`/trips/${variables.tripId}`);
+      variables.onSuccess?.();
     },
   });
 }

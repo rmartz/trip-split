@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { parseAmountCents } from "@/lib/parse-amount";
 import type { Expense, TripMember } from "@/types";
 import { EDIT_EXPENSE_COPY } from "./EditExpenseFormView.copy";
 
@@ -67,20 +68,8 @@ export function EditExpenseFormView({
       return;
     }
 
-    const trimmedAmount = amount.trim();
-    const amountRegex = /^\d+(\.\d{1,2})?$/;
-    if (!amountRegex.test(trimmedAmount)) {
-      setValidationError(EDIT_EXPENSE_COPY.amountInvalid);
-      return;
-    }
-    const [intStr, fracStr] = trimmedAmount.split(".") as [
-      string,
-      string | undefined,
-    ];
-    const totalCents =
-      parseInt(intStr, 10) * 100 +
-      (fracStr !== undefined ? parseInt(fracStr.padEnd(2, "0"), 10) : 0);
-    if (totalCents <= 0) {
+    const totalCents = parseAmountCents(amount);
+    if (totalCents === undefined) {
       setValidationError(EDIT_EXPENSE_COPY.amountInvalid);
       return;
     }

@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import { useExpense, useMembers, useUpdateExpenseMutation } from "@/lib/hooks";
 import { EDIT_EXPENSE_COPY } from "./EditExpenseFormView.copy";
 import { EditExpenseFormView } from "./EditExpenseFormView";
@@ -13,6 +15,7 @@ export function EditExpenseContent({
   expenseId,
   tripId,
 }: EditExpenseContentProps) {
+  const router = useRouter();
   const { data: expense, isLoading: isExpenseLoading } = useExpense(
     tripId,
     expenseId,
@@ -20,22 +23,6 @@ export function EditExpenseContent({
   const { data: members = [], isLoading: isMembersLoading } =
     useMembers(tripId);
   const mutation = useUpdateExpenseMutation();
-
-  if (isExpenseLoading || isMembersLoading) {
-    return (
-      <div className="mx-auto w-full max-w-lg px-4 py-8">
-        <p className="text-muted-foreground">{EDIT_EXPENSE_COPY.loading}</p>
-      </div>
-    );
-  }
-
-  if (!expense) {
-    return (
-      <div className="mx-auto w-full max-w-lg px-4 py-8">
-        <p className="text-muted-foreground">{EDIT_EXPENSE_COPY.notFound}</p>
-      </div>
-    );
-  }
 
   const handleSubmit = (
     description: string,
@@ -45,6 +32,9 @@ export function EditExpenseContent({
   ) => {
     mutation.mutate({
       expenseId,
+      onSuccess: () => {
+        router.push(`/trips/${tripId}`);
+      },
       tripId,
       updates: {
         description,
@@ -55,7 +45,15 @@ export function EditExpenseContent({
     });
   };
 
-  return (
+  return isExpenseLoading || isMembersLoading ? (
+    <div className="mx-auto w-full max-w-lg px-4 py-8">
+      <p className="text-muted-foreground">{EDIT_EXPENSE_COPY.loading}</p>
+    </div>
+  ) : !expense ? (
+    <div className="mx-auto w-full max-w-lg px-4 py-8">
+      <p className="text-muted-foreground">{EDIT_EXPENSE_COPY.notFound}</p>
+    </div>
+  ) : (
     <EditExpenseFormView
       error={mutation.error?.message}
       expense={expense}

@@ -62,37 +62,39 @@ export function ExpenseCard({
             >
               <Pencil />
             </Link>
-            <AlertDialog>
-              <AlertDialogTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label={EXPENSE_CARD_COPY.deleteButton}
-                  />
-                }
-              >
-                <Trash2 />
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    {EXPENSE_CARD_COPY.deleteConfirmTitle}
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {EXPENSE_CARD_COPY.deleteConfirmDescription}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>
-                    {EXPENSE_CARD_COPY.deleteCancel}
-                  </AlertDialogCancel>
-                  <AlertDialogAction onClick={onDelete}>
-                    {EXPENSE_CARD_COPY.deleteButton}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            {onDelete && (
+              <AlertDialog>
+                <AlertDialogTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={EXPENSE_CARD_COPY.deleteButton}
+                    />
+                  }
+                >
+                  <Trash2 />
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      {EXPENSE_CARD_COPY.deleteConfirmTitle}
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {EXPENSE_CARD_COPY.deleteConfirmDescription}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>
+                      {EXPENSE_CARD_COPY.deleteCancel}
+                    </AlertDialogCancel>
+                    <AlertDialogAction onClick={onDelete}>
+                      {EXPENSE_CARD_COPY.deleteButton}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
           </div>
         )}
       </div>

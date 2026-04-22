@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { Expense } from "@/types";
 
@@ -112,7 +112,26 @@ describe("ExpenseCard", () => {
     ).toBeNull();
   });
 
-  it("shows edit and delete buttons when canEdit is true", () => {
+  it("shows edit and delete buttons when canEdit is true and onDelete is provided", () => {
+    render(
+      <ExpenseCard
+        canEdit={true}
+        expense={makeExpense()}
+        onDelete={vi.fn()}
+        paidByName="Alice"
+        tripId="trip-1"
+      />,
+    );
+
+    expect(
+      screen.getByRole("link", { name: EXPENSE_CARD_COPY.editButton }),
+    ).toBeDefined();
+    expect(
+      screen.getByRole("button", { name: EXPENSE_CARD_COPY.deleteButton }),
+    ).toBeDefined();
+  });
+
+  it("shows only the edit button when canEdit is true but onDelete is not provided", () => {
     render(
       <ExpenseCard
         canEdit={true}
@@ -126,8 +145,8 @@ describe("ExpenseCard", () => {
       screen.getByRole("link", { name: EXPENSE_CARD_COPY.editButton }),
     ).toBeDefined();
     expect(
-      screen.getByRole("button", { name: EXPENSE_CARD_COPY.deleteButton }),
-    ).toBeDefined();
+      screen.queryByRole("button", { name: EXPENSE_CARD_COPY.deleteButton }),
+    ).toBeNull();
   });
 
   it("edit button links to the edit page", () => {

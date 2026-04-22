@@ -73,8 +73,28 @@ export async function updateExpense(
 ): Promise<void> {
   const db = getDb();
 
-  await update(ref(db, `expenses/${tripId}/${expenseId}`), {
+  // Build a partial Firebase payload by converting only the supplied fields
+  // through expenseToFirebase so any future field renames stay in sync.
+  const sentinel: Omit<Expense, "id" | "createdAt" | "updatedAt"> = {
+    createdBy: "",
+    currency: "",
+    description: "",
+    paidByMemberId: "",
+    splitAmong: [],
+    splitType: "equal",
+    totalAmountCents: 0,
     ...updates,
+  };
+  const allFirebase = expenseToFirebase(sentinel);
+  const firebaseUpdates = Object.fromEntries(
+    Object.keys(updates).map((key) => [
+      key,
+      allFirebase[key as keyof typeof allFirebase],
+    ]),
+  );
+
+  await update(ref(db, `expenses/${tripId}/${expenseId}`), {
+    ...firebaseUpdates,
     updatedAt: new Date().toISOString(),
   });
 }
