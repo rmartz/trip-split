@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { Expense, TripMember } from "@/types";
+import { SplitType } from "@/types";
 
 import { calculateBalances } from "./balances";
 
@@ -13,7 +14,7 @@ function makeExpense(overrides?: Partial<Expense>): Expense {
     id: "expense-1",
     paidByMemberId: "member-1",
     splitAmong: ["member-1", "member-2"],
-    splitType: "equal",
+    splitType: SplitType.Equal,
     totalAmountCents: 1000,
     updatedAt: new Date("2026-03-15T10:00:00Z"),
     ...overrides,
@@ -64,7 +65,7 @@ describe("calculateBalances", () => {
         makeExpense({
           paidByMemberId: "member-1",
           splitAmong: ["member-1", "member-2"],
-          splitType: "equal",
+          splitType: SplitType.Equal,
           totalAmountCents: 1000,
         }),
       ];
@@ -98,7 +99,7 @@ describe("calculateBalances", () => {
         makeExpense({
           paidByMemberId: "member-1",
           splitAmong: ["member-1", "member-2", "member-3"],
-          splitType: "equal",
+          splitType: SplitType.Equal,
           totalAmountCents: 1000,
         }),
       ];
@@ -130,7 +131,7 @@ describe("calculateBalances", () => {
           id: "expense-1",
           paidByMemberId: "member-1",
           splitAmong: ["member-2", "member-3"],
-          splitType: "itemized",
+          splitType: SplitType.Itemized,
           totalAmountCents: 10000,
         }),
       ];

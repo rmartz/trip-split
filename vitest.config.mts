@@ -12,6 +12,7 @@ export default defineConfig({
   test: {
     projects: [
       {
+        extends: true,
         test: {
           name: "node",
           environment: "node",

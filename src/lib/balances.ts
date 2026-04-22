@@ -13,8 +13,10 @@ export function calculateBalances(
   }
 
   for (const expense of expenses) {
-    const paidBefore = paidMap.get(expense.paidByMemberId) ?? 0;
-    paidMap.set(expense.paidByMemberId, paidBefore + expense.totalAmountCents);
+    paidMap.set(
+      expense.paidByMemberId,
+      (paidMap.get(expense.paidByMemberId) ?? 0) + expense.totalAmountCents,
+    );
 
     const splitCount = expense.splitAmong.length;
     if (splitCount === 0) continue;
@@ -22,11 +24,10 @@ export function calculateBalances(
     const baseShare = Math.floor(expense.totalAmountCents / splitCount);
     const remainder = expense.totalAmountCents % splitCount;
 
-    expense.splitAmong.forEach((memberId, index) => {
+    for (const [index, memberId] of expense.splitAmong.entries()) {
       const share = baseShare + (index < remainder ? 1 : 0);
-      const owesBefore = owesMap.get(memberId) ?? 0;
-      owesMap.set(memberId, owesBefore + share);
-    });
+      owesMap.set(memberId, (owesMap.get(memberId) ?? 0) + share);
+    }
   }
 
   return members.map((member) => {
