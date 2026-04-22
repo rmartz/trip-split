@@ -36,7 +36,7 @@ export function useSignInWithGoogleMutation() {
   const router = useRouter();
 
   return useMutation({
-    mutationFn: () => signInWithGoogle(),
+    mutationFn: signInWithGoogle,
     onSuccess: () => {
       router.push("/dashboard");
     },

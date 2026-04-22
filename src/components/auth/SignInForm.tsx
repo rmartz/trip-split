@@ -40,6 +40,7 @@ export function SignInForm() {
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
     setValidationError(undefined);
+    googleMutation.reset();
 
     const error = validate();
     if (error) {
@@ -77,6 +78,7 @@ export function SignInForm() {
               onChange={(e) => {
                 setEmail(e.target.value);
                 setValidationError(undefined);
+                googleMutation.reset();
               }}
               autoComplete="email"
             />
@@ -90,6 +92,7 @@ export function SignInForm() {
               onChange={(e) => {
                 setPassword(e.target.value);
                 setValidationError(undefined);
+                googleMutation.reset();
               }}
               autoComplete="current-password"
             />
@@ -115,6 +118,8 @@ export function SignInForm() {
             className="w-full"
             disabled={isPending}
             onClick={() => {
+              mutation.reset();
+              setValidationError(undefined);
               googleMutation.mutate();
             }}
           >
