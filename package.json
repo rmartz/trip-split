@@ -49,12 +49,12 @@
     "lint-staged": "^16",
     "prettier": "^3",
     "prettier-plugin-tailwindcss": "^0.7",
-    "shadcn": "^4.3.0",
+    "shadcn": "^4.4.0",
     "storybook": "^10.3.5",
     "tailwindcss": "^4",
     "typescript": "^6",
     "typescript-eslint": "^8",
-    "vite": "^8.0.8",
+    "vite": "^8.0.9",
     "vitest": "^4"
   },
   "lint-staged": {
