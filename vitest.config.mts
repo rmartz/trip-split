@@ -12,6 +12,11 @@ export default defineConfig({
   test: {
     projects: [
       {
+        resolve: {
+          alias: {
+            "@": resolve(__dirname, "src"),
+          },
+        },
         test: {
           name: "node",
           environment: "node",

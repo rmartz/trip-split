@@ -1,4 +1,10 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { SplitType } from "@/types";
@@ -303,10 +309,10 @@ describe("AddExpenseFormView", () => {
       );
       fireEvent.change(itemDescInputs[0], { target: { value: "Salad" } });
 
-      const itemAmountInputs = screen.getAllByPlaceholderText(
-        copy.itemAmountPlaceholder,
-      );
-      fireEvent.change(itemAmountInputs[0], { target: { value: "13.00" } });
+      const itemCard = screen.getByTestId("line-item-0");
+      fireEvent.change(within(itemCard).getByLabelText(copy.itemAmountLabel), {
+        target: { value: "13.00" },
+      });
 
       // Tax
       fireEvent.change(screen.getByLabelText(/Tax/), {

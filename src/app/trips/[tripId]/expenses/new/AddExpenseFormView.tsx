@@ -155,7 +155,10 @@ export function AddExpenseFormView({
     const taxCents = parseCentsFromInput(taxInput) ?? 0;
     const tipCents = parseCentsFromInput(tipInput) ?? 0;
 
-    const subtotal = parsedItems.reduce((sum, item) => sum + item.amountCents, 0);
+    const subtotal = parsedItems.reduce(
+      (sum, item) => sum + item.amountCents,
+      0,
+    );
     if (subtotal + taxCents + tipCents !== totalCents) {
       setValidationError(copy.itemizedSubtotalMismatch);
       return;
@@ -324,6 +327,7 @@ export function AddExpenseFormView({
                 {lineItems.map((item, index) => (
                   <div
                     key={index}
+                    data-testid={`line-item-${String(index)}`}
                     className="space-y-2 rounded-md border p-3"
                   >
                     <div className="flex items-center justify-between">
@@ -355,8 +359,11 @@ export function AddExpenseFormView({
                         );
                       }}
                     />
-                    <Label>{copy.itemAmountLabel}</Label>
+                    <Label htmlFor={`item-${String(index)}-amount`}>
+                      {copy.itemAmountLabel}
+                    </Label>
                     <Input
+                      id={`item-${String(index)}-amount`}
                       type="text"
                       inputMode="decimal"
                       placeholder={copy.itemAmountPlaceholder}
