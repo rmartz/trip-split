@@ -14,10 +14,9 @@ export function getAuthErrorMessage(error: unknown): string {
     typeof error === "object" &&
     error !== null &&
     "code" in error &&
-    typeof (error as { code: unknown }).code === "string"
+    typeof error.code === "string"
   ) {
-    const code = (error as { code: string }).code;
-    return FIREBASE_ERROR_MAP[code] ?? AUTH_COPY.errors.generic;
+    return FIREBASE_ERROR_MAP[error.code] ?? AUTH_COPY.errors.generic;
   }
   return AUTH_COPY.errors.generic;
 }
