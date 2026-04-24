@@ -2,8 +2,8 @@
 
 import { useAuth } from "@/components/auth";
 import { useAddExpenseMutation, useMembers } from "@/lib/hooks";
+import type { ExpenseFormSubmitData } from "@/types";
 import { ADD_EXPENSE_COPY } from "./AddExpenseFormView.copy";
-import type { ExpenseFormSubmitData } from "./AddExpenseFormView";
 import { AddExpenseFormView } from "./AddExpenseFormView";
 
 interface AddExpenseContentProps {

@@ -10,10 +10,12 @@ export const ADD_EXPENSE_COPY = {
   descriptionPlaceholder: "e.g. Dinner, Hotel, Taxi",
   descriptionRequired: "Description is required",
   equalSplitLabel: "Equal split",
+  itemAmountInvalid: "Each line item must have a positive amount",
   itemAmountLabel: "Amount",
   itemAmountPlaceholder: "0.00",
   itemDescriptionLabel: "Description",
   itemDescriptionPlaceholder: "e.g. Salad",
+  itemDescriptionRequired: "Each line item must have a description",
   itemizedSplitLabel: "Itemized",
   itemizedSubtotalMismatch:
     "Subtotal + tax + tip does not match the total amount",

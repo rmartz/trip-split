@@ -274,6 +274,70 @@ describe("AddExpenseFormView", () => {
       expect(screen.getByText(copy.itemizedSubtotalMismatch)).toBeDefined();
     });
 
+    it("shows item description required error when a line item has no description", () => {
+      render(
+        <AddExpenseFormView
+          isPending={false}
+          members={members}
+          onSubmit={vi.fn()}
+          tripId="trip-1"
+        />,
+      );
+
+      fireEvent.change(
+        screen.getByPlaceholderText(copy.descriptionPlaceholder),
+        { target: { value: "Dinner" } },
+      );
+      fireEvent.change(screen.getByPlaceholderText(copy.amountPlaceholder), {
+        target: { value: "10.00" },
+      });
+      fireEvent.click(
+        screen.getByRole("radio", { name: copy.itemizedSplitLabel }),
+      );
+
+      // Leave the item description empty, set a matching amount
+      const itemCard = screen.getByTestId("line-item-0");
+      fireEvent.change(within(itemCard).getByLabelText(copy.itemAmountLabel), {
+        target: { value: "10.00" },
+      });
+
+      fireEvent.click(screen.getByRole("button", { name: copy.submitButton }));
+
+      expect(screen.getByText(copy.itemDescriptionRequired)).toBeDefined();
+    });
+
+    it("shows item amount invalid error when a line item has zero amount", () => {
+      render(
+        <AddExpenseFormView
+          isPending={false}
+          members={members}
+          onSubmit={vi.fn()}
+          tripId="trip-1"
+        />,
+      );
+
+      fireEvent.change(
+        screen.getByPlaceholderText(copy.descriptionPlaceholder),
+        { target: { value: "Dinner" } },
+      );
+      fireEvent.change(screen.getByPlaceholderText(copy.amountPlaceholder), {
+        target: { value: "10.00" },
+      });
+      fireEvent.click(
+        screen.getByRole("radio", { name: copy.itemizedSplitLabel }),
+      );
+
+      // Set item description but leave amount empty (parses as 0)
+      const itemDescInputs = screen.getAllByPlaceholderText(
+        copy.itemDescriptionPlaceholder,
+      );
+      fireEvent.change(itemDescInputs[0], { target: { value: "Salad" } });
+
+      fireEvent.click(screen.getByRole("button", { name: copy.submitButton }));
+
+      expect(screen.getByText(copy.itemAmountInvalid)).toBeDefined();
+    });
+
     it("calls onSubmit with itemized data when valid", () => {
       const onSubmit = vi.fn();
       render(
@@ -307,11 +371,11 @@ describe("AddExpenseFormView", () => {
       });
 
       // Tax
-      fireEvent.change(screen.getByLabelText(/Tax/), {
+      fireEvent.change(screen.getByLabelText(copy.taxLabel), {
         target: { value: "1.00" },
       });
       // Tip
-      fireEvent.change(screen.getByLabelText(/Tip/), {
+      fireEvent.change(screen.getByLabelText(copy.tipLabel), {
         target: { value: "1.00" },
       });
 

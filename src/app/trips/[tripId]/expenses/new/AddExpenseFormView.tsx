@@ -13,7 +13,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { type ExpenseItem, SplitType, type TripMember } from "@/types";
+import {
+  type ExpenseFormSubmitData,
+  type ExpenseItem,
+  SplitType,
+  type TripMember,
+} from "@/types";
 import { ADD_EXPENSE_COPY } from "./AddExpenseFormView.copy";
 
 const copy = ADD_EXPENSE_COPY;
@@ -34,21 +39,16 @@ interface LineItemDraft {
   amountInput: string;
   assignedTo: string[];
   description: string;
+  uid: string;
 }
 
 function makeEmptyLineItem(memberIds: string[]): LineItemDraft {
-  return { amountInput: "", assignedTo: memberIds, description: "" };
-}
-
-export interface ExpenseFormSubmitData {
-  description: string;
-  items?: ExpenseItem[];
-  paidByMemberId: string;
-  splitAmong: string[];
-  splitType: SplitType;
-  taxCents?: number;
-  tipCents?: number;
-  totalAmountCents: number;
+  return {
+    amountInput: "",
+    assignedTo: memberIds,
+    description: "",
+    uid: crypto.randomUUID(),
+  };
 }
 
 interface AddExpenseFormViewProps {
@@ -152,6 +152,16 @@ export function AddExpenseFormView({
       };
     });
 
+    if (parsedItems.some((item) => !item.description.trim())) {
+      setValidationError(copy.itemDescriptionRequired);
+      return;
+    }
+
+    if (parsedItems.some((item) => item.amountCents <= 0)) {
+      setValidationError(copy.itemAmountInvalid);
+      return;
+    }
+
     const taxCents = parseCentsFromInput(taxInput) ?? 0;
     const tipCents = parseCentsFromInput(tipInput) ?? 0;
 
@@ -164,6 +174,11 @@ export function AddExpenseFormView({
       return;
     }
 
+    // splitAmong for itemized expenses is the union of per-item assignedTo
+    // arrays. The payer (paidByMemberId) is not automatically included because
+    // balance calculations for itemized expenses are driven by the items
+    // themselves, not by splitAmong. A member who paid but was not assigned any
+    // item is treated as fronting the money, not as a consumer of the expense.
     const allAssigned = [
       ...new Set(parsedItems.flatMap((item) => item.assignedTo)),
     ];
@@ -326,7 +341,7 @@ export function AddExpenseFormView({
               <div className="space-y-3">
                 {lineItems.map((item, index) => (
                   <div
-                    key={index}
+                    key={item.uid}
                     data-testid={`line-item-${String(index)}`}
                     className="space-y-2 rounded-md border p-3"
                   >

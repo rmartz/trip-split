@@ -9,6 +9,17 @@ export interface ExpenseItem {
   description: string;
 }
 
+export interface ExpenseFormSubmitData {
+  description: string;
+  items?: ExpenseItem[];
+  paidByMemberId: string;
+  splitAmong: string[];
+  splitType: SplitType;
+  taxCents?: number;
+  tipCents?: number;
+  totalAmountCents: number;
+}
+
 export interface Expense {
   createdAt: Date;
   createdBy: string;
