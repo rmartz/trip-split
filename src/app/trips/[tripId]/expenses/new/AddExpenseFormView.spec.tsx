@@ -1,11 +1,5 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  within,
-} from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
 import { SplitType } from "@/types";
 
@@ -20,8 +14,6 @@ const members = [
 ];
 
 describe("AddExpenseFormView", () => {
-  afterEach(cleanup);
-
   it("renders the form title and subtitle", () => {
     render(
       <AddExpenseFormView
