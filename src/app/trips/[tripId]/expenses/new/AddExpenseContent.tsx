@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/components/auth";
 import { useAddExpenseMutation, useMembers } from "@/lib/hooks";
+import { SplitType } from "@/types";
 import { ADD_EXPENSE_COPY } from "./AddExpenseFormView.copy";
 import { AddExpenseFormView } from "./AddExpenseFormView";
 
@@ -30,7 +31,7 @@ export function AddExpenseContent({ tripId }: AddExpenseContentProps) {
         description,
         paidByMemberId,
         splitAmong,
-        splitType: "equal",
+        splitType: SplitType.Equal,
         totalAmountCents,
       },
     });
