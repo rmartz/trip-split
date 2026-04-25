@@ -72,13 +72,22 @@ echo "Checking prerequisites..."
 
 VERCEL="pnpm exec vercel"
 
-for tool in gcloud sentry-cli jq; do
+# Determine whether any target environment has Sentry configured
+SENTRY_NEEDED=false
+for env in "${ENVS_TO_ROTATE[@]}"; do
+  sentry_org=$(grep "^  SENTRY_ORG:" "$DEPLOYMENT_DIR/$env.yml" | sed 's/.*: *//' | tr -d "\"' ")
+  if [[ -n "$sentry_org" ]]; then
+    SENTRY_NEEDED=true
+    break
+  fi
+done
+
+for tool in gcloud jq; do
   if ! command -v "$tool" &>/dev/null; then
     echo "ERROR: $tool not found."
     case "$tool" in
-      gcloud)     echo "  Install: https://cloud.google.com/sdk/docs/install" ;;
-      sentry-cli) echo "  Install: curl -sL https://sentry.io/get-cli/ | bash" ;;
-      jq)         echo "  Install: brew install jq" ;;
+      gcloud) echo "  Install: https://cloud.google.com/sdk/docs/install" ;;
+      jq)     echo "  Install: brew install jq" ;;
     esac
     exit 1
   fi
@@ -94,16 +103,24 @@ if ! $VERCEL whoami &>/dev/null 2>&1; then
   exit 1
 fi
 
-# Sentry: accept either sentry-cli session or env var
-SENTRY_TOKEN="${SENTRY_AUTH_TOKEN:-}"
-if [[ -z "$SENTRY_TOKEN" ]]; then
-  SENTRY_TOKEN=$(grep "^token" ~/.sentryclirc 2>/dev/null | awk -F= '{print $2}' | tr -d ' ' || true)
-fi
-if [[ -z "$SENTRY_TOKEN" ]]; then
-  echo "ERROR: No Sentry credentials found."
-  echo "  Run: sentry-cli login"
-  echo "  Or:  export SENTRY_AUTH_TOKEN=<your-personal-token>"
-  exit 1
+# Sentry credentials — only required when SENTRY_ORG is set in a target environment
+SENTRY_TOKEN=""
+if [[ "$SENTRY_NEEDED" == "true" ]]; then
+  if ! command -v sentry-cli &>/dev/null; then
+    echo "ERROR: sentry-cli not found (required — SENTRY_ORG is configured)."
+    echo "  Install: curl -sL https://sentry.io/get-cli/ | bash"
+    exit 1
+  fi
+  SENTRY_TOKEN="${SENTRY_AUTH_TOKEN:-}"
+  if [[ -z "$SENTRY_TOKEN" ]]; then
+    SENTRY_TOKEN=$(grep "^token" ~/.sentryclirc 2>/dev/null | awk -F= '{print $2}' | tr -d ' ' || true)
+  fi
+  if [[ -z "$SENTRY_TOKEN" ]]; then
+    echo "ERROR: No Sentry credentials found."
+    echo "  Run: sentry-cli login"
+    echo "  Or:  export SENTRY_AUTH_TOKEN=<your-personal-token>"
+    exit 1
+  fi
 fi
 
 echo "All prerequisites met."
