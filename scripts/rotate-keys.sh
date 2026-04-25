@@ -258,12 +258,16 @@ rotate_environment() {
 
   # Decommission old credentials (only after healthy deployment confirmed)
   echo "6. Decommissioning old credentials..."
-  for old_key_id in "${OLD_KEY_IDS[@]}"; do
-    gcloud iam service-accounts keys delete "$old_key_id" \
-      --iam-account="$sa_email" \
-      --project="$project_id" \
-      --quiet 2>/dev/null && echo "   Deleted Firebase key: $old_key_id" || true
-  done
+  if [[ ${#OLD_KEY_IDS[@]} -eq 0 ]]; then
+    echo "   No pre-existing user-managed keys to decommission."
+  else
+    for old_key_id in "${OLD_KEY_IDS[@]}"; do
+      gcloud iam service-accounts keys delete "$old_key_id" \
+        --iam-account="$sa_email" \
+        --project="$project_id" \
+        --quiet 2>/dev/null && echo "   Deleted Firebase key: $old_key_id" || true
+    done
+  fi
 
   # Sentry: automatic revocation is skipped because listing all account tokens and
   # excluding the new one would delete tokens belonging to other projects on the
