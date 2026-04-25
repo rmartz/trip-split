@@ -13,12 +13,16 @@ export const ADD_EXPENSE_COPY = {
   itemAmountInvalid: "Each line item must have a positive amount",
   itemAmountLabel: "Amount",
   itemAmountPlaceholder: "0.00",
+  itemAssigneeRequired:
+    "Each line item must be assigned to at least one member",
   itemDescriptionLabel: "Description",
   itemDescriptionPlaceholder: "e.g. Salad",
   itemDescriptionRequired: "Each line item must have a description",
   itemizedSplitLabel: "Itemized",
   itemizedSubtotalMismatch:
     "Subtotal + tax + tip does not match the total amount",
+  taxInvalid: "Enter a valid tax amount",
+  tipInvalid: "Enter a valid tip amount",
   loading: "Loading\u2026",
   noMembersEmptyState:
     "Add at least one trip member before creating an expense.",

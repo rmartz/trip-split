@@ -2,6 +2,7 @@ import { get, push, ref, remove, set, update } from "firebase/database";
 
 import { getDb } from "@/lib/database";
 import type { Expense } from "@/types";
+import { SplitType } from "@/types";
 import { expenseToFirebase, firebaseToExpense } from "./expense-schema";
 
 export async function addExpense(
@@ -76,8 +77,20 @@ export async function updateExpense(
 ): Promise<void> {
   const db = getDb();
 
+  // When the splitType is being set to Equal, explicitly null out
+  // itemized-only fields so previously stored values are cleared in Firebase.
+  const normalizedUpdates =
+    updates.splitType === SplitType.Equal
+      ? {
+          ...updates,
+          items: null,
+          taxCents: null,
+          tipCents: null,
+        }
+      : updates;
+
   await update(ref(db, `expenses/${tripId}/${expenseId}`), {
-    ...updates,
+    ...normalizedUpdates,
     updatedAt: new Date().toISOString(),
   });
 }

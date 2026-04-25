@@ -89,6 +89,7 @@ export function AddExpenseFormView({
   };
 
   const handleToggleItemMember = (itemIndex: number, memberId: string) => {
+    setValidationError(undefined);
     setLineItems((prev) =>
       prev.map((item, i) => {
         if (i !== itemIndex) return item;
@@ -162,8 +163,24 @@ export function AddExpenseFormView({
       return;
     }
 
-    const taxCents = parseCentsFromInput(taxInput) ?? 0;
-    const tipCents = parseCentsFromInput(tipInput) ?? 0;
+    if (parsedItems.some((item) => item.assignedTo.length === 0)) {
+      setValidationError(copy.itemAssigneeRequired);
+      return;
+    }
+
+    const parsedTaxCents = parseCentsFromInput(taxInput);
+    if (parsedTaxCents === undefined) {
+      setValidationError(copy.taxInvalid);
+      return;
+    }
+    const taxCents = parsedTaxCents;
+
+    const parsedTipCents = parseCentsFromInput(tipInput);
+    if (parsedTipCents === undefined) {
+      setValidationError(copy.tipInvalid);
+      return;
+    }
+    const tipCents = parsedTipCents;
 
     const subtotal = parsedItems.reduce(
       (sum, item) => sum + item.amountCents,
@@ -346,9 +363,9 @@ export function AddExpenseFormView({
                     className="space-y-2 rounded-md border p-3"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">
+                      <Label htmlFor={`item-${String(index)}-description`}>
                         {copy.itemDescriptionLabel}
-                      </span>
+                      </Label>
                       {lineItems.length > 1 && (
                         <button
                           type="button"
@@ -362,9 +379,11 @@ export function AddExpenseFormView({
                       )}
                     </div>
                     <Input
+                      id={`item-${String(index)}-description`}
                       placeholder={copy.itemDescriptionPlaceholder}
                       value={item.description}
                       onChange={(e) => {
+                        setValidationError(undefined);
                         setLineItems((prev) =>
                           prev.map((li, i) =>
                             i === index
@@ -384,6 +403,7 @@ export function AddExpenseFormView({
                       placeholder={copy.itemAmountPlaceholder}
                       value={item.amountInput}
                       onChange={(e) => {
+                        setValidationError(undefined);
                         setLineItems((prev) =>
                           prev.map((li, i) =>
                             i === index

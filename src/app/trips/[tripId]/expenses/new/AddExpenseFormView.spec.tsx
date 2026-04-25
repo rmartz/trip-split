@@ -328,10 +328,11 @@ describe("AddExpenseFormView", () => {
       );
 
       // Set item description but leave amount empty (parses as 0)
-      const itemDescInputs = screen.getAllByPlaceholderText(
-        copy.itemDescriptionPlaceholder,
+      const itemCard = screen.getByTestId("line-item-0");
+      fireEvent.change(
+        within(itemCard).getByLabelText(copy.itemDescriptionLabel),
+        { target: { value: "Salad" } },
       );
-      fireEvent.change(itemDescInputs[0], { target: { value: "Salad" } });
 
       fireEvent.click(screen.getByRole("button", { name: copy.submitButton }));
 
@@ -360,12 +361,11 @@ describe("AddExpenseFormView", () => {
         screen.getByRole("radio", { name: copy.itemizedSplitLabel }),
       );
 
-      const itemDescInputs = screen.getAllByPlaceholderText(
-        copy.itemDescriptionPlaceholder,
-      );
-      fireEvent.change(itemDescInputs[0], { target: { value: "Salad" } });
-
       const itemCard = screen.getByTestId("line-item-0");
+      fireEvent.change(
+        within(itemCard).getByLabelText(copy.itemDescriptionLabel),
+        { target: { value: "Salad" } },
+      );
       fireEvent.change(within(itemCard).getByLabelText(copy.itemAmountLabel), {
         target: { value: "13.00" },
       });
