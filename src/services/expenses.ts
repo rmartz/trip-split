@@ -1,6 +1,7 @@
 import { get, push, ref, remove, set, update } from "firebase/database";
 
 import { getDb } from "@/lib/database";
+import { SplitType } from "@/types";
 import type { Expense } from "@/types";
 import { expenseToFirebase, firebaseToExpense } from "./expense-schema";
 
@@ -81,7 +82,7 @@ export async function updateExpense(
     description: "",
     paidByMemberId: "",
     splitAmong: [],
-    splitType: "equal",
+    splitType: SplitType.Equal,
     totalAmountCents: 0,
     ...updates,
   };
