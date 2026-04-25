@@ -1,4 +1,7 @@
-export type SplitType = "equal" | "itemized";
+export enum SplitType {
+  Equal = "equal",
+  Itemized = "itemized",
+}
 
 export interface Expense {
   createdAt: Date;
