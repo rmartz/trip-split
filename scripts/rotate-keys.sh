@@ -126,16 +126,20 @@ rotate_environment() {
   echo "══════════════════════════════════════════"
 
   # Read project config
+  # Extract value after the colon and strip optional surrounding quotes (both ' and ").
+  # This handles both quoted values written by update-config.sh and manually-edited
+  # unquoted values, which are equally valid YAML.
   local project_id
-  project_id=$(grep "^  FIREBASE_PROJECT_ID:" "$config_file" | awk -F'"' '{print $2}' | tr -d ' ')
+  project_id=$(grep "^  FIREBASE_PROJECT_ID:" "$config_file" | sed 's/.*: *//' | tr -d "\"' ")
   if [[ -z "$project_id" ]]; then
-    echo "ERROR: FIREBASE_PROJECT_ID not set in $config_file"
+    echo "ERROR: FIREBASE_PROJECT_ID is empty or not set in $config_file"
+    echo "  Run: scripts/update-config.sh --env=$env --firebase-config=/path/to/config.json"
     exit 1
   fi
 
   local sentry_org sentry_project
-  sentry_org=$(grep "^  SENTRY_ORG:" "$config_file" | awk -F'"' '{print $2}' | tr -d ' ')
-  sentry_project=$(grep "^  SENTRY_PROJECT:" "$config_file" | awk -F'"' '{print $2}' | tr -d ' ')
+  sentry_org=$(grep "^  SENTRY_ORG:" "$config_file" | sed 's/.*: *//' | tr -d "\"' ")
+  sentry_project=$(grep "^  SENTRY_PROJECT:" "$config_file" | sed 's/.*: *//' | tr -d "\"' ")
 
   # Resolve service account email
   local sa_email
