@@ -44,7 +44,8 @@ if [[ ! -f "$ENVIRONMENTS_FILE" ]]; then
 fi
 
 SINGLE_ENV=$(grep "^single_environment:" "$ENVIRONMENTS_FILE" | awk '{print $2}' || echo "false")
-mapfile -t CONFIGURED_ENVS < <(grep "^  - " "$ENVIRONMENTS_FILE" | awk '{print $2}')
+CONFIGURED_ENVS=()
+while IFS= read -r line; do CONFIGURED_ENVS+=("$line"); done < <(grep "^  - " "$ENVIRONMENTS_FILE" | awk '{print $2}')
 
 if [[ "${#CONFIGURED_ENVS[@]}" -lt 2 && "$SINGLE_ENV" != "true" && "$FORCE_SINGLE" != "true" ]]; then
   echo "ERROR: Only one environment is configured but single_environment is not true."
@@ -155,7 +156,8 @@ rotate_environment() {
 
   # Capture the current key IDs before creating new ones
   echo "1. Capturing existing Firebase key IDs..."
-  mapfile -t OLD_KEY_IDS < <(gcloud iam service-accounts keys list \
+  OLD_KEY_IDS=()
+  while IFS= read -r line; do OLD_KEY_IDS+=("$line"); done < <(gcloud iam service-accounts keys list \
     --iam-account="$sa_email" \
     --project="$project_id" \
     --managed-by=user \
