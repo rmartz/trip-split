@@ -1,8 +1,9 @@
 "use client";
 
 import { Component } from "react";
-import type { ReactNode } from "react";
+import type { ErrorInfo, ReactNode } from "react";
 
+import { Button } from "@/components/ui/button";
 import { ERROR_BOUNDARY_COPY } from "./ErrorBoundary.copy";
 
 interface ErrorBoundaryProps {
@@ -27,7 +28,7 @@ export class ErrorBoundary extends Component<
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, info: React.ErrorInfo) {
+  componentDidCatch(error: Error, info: ErrorInfo) {
     console.error("Unhandled error:", error, info);
   }
 
@@ -39,14 +40,14 @@ export class ErrorBoundary extends Component<
             {ERROR_BOUNDARY_COPY.title}
           </h1>
           <p className="text-muted-foreground">{ERROR_BOUNDARY_COPY.message}</p>
-          <button
+          <Button
+            variant="link"
             onClick={() => {
-              this.setState({ hasError: false, error: undefined });
+              window.location.reload();
             }}
-            className="text-primary underline underline-offset-4"
           >
             {ERROR_BOUNDARY_COPY.retry}
-          </button>
+          </Button>
         </div>
       );
     }
