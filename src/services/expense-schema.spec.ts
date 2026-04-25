@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { SplitType } from "@/types";
+
 import { expenseToFirebase, firebaseToExpense } from "./expense-schema";
 
 describe("expenseToFirebase", () => {
@@ -11,7 +13,7 @@ describe("expenseToFirebase", () => {
         description: "Dinner",
         paidByMemberId: "member-1",
         splitAmong: ["member-1", "member-2"],
-        splitType: "equal",
+        splitType: SplitType.Equal,
         totalAmountCents: 5000,
       }),
     ).toEqual({
