@@ -24,6 +24,20 @@ paths = [
   ".env.example",
 ]
 
+[[allowlists]]
+description = "Firebase Client SDK API keys in deployment YAML — public browser keys, access-controlled by Firebase security rules"
+# These are NEXT_PUBLIC_FIREBASE_API_KEY values, intentionally committed to deployment/
+# config files so deploy-config.sh can push them to Vercel. They are not service account
+# credentials and cannot be used to access Firebase data without a matching security rule.
+regexTarget = "line"
+regexes = [
+  '''NEXT_PUBLIC_FIREBASE_API_KEY''',
+]
+paths = [
+  '''deployment/staging\.yml''',
+  '''deployment/production\.yml''',
+]
+
 # Project-specific rules for secrets not covered by the default ruleset
 
 [[rules]]

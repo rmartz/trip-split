@@ -15,6 +15,14 @@ VERCEL="pnpm exec vercel"
 
 # ── Prerequisites ─────────────────────────────────────────────────────────────
 
+if ! command -v pnpm &>/dev/null; then
+  echo "ERROR: pnpm not found. Install it from https://pnpm.io/installation"
+  exit 1
+fi
+if ! pnpm exec vercel --version &>/dev/null 2>&1; then
+  echo "ERROR: vercel not found in node_modules. Run: pnpm install"
+  exit 1
+fi
 if ! $VERCEL whoami &>/dev/null 2>&1; then
   echo "ERROR: Not authenticated with Vercel."
   echo "Run: pnpm exec vercel login"

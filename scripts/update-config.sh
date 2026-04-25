@@ -12,6 +12,8 @@
 #
 # Pass --sync to also push the updated values to Vercel immediately after writing
 # the YAML (calls deploy-config.sh). Without --sync, only the local YAML is updated.
+# --sync requires: pnpm, the vercel devDependency (pnpm install), and an active
+# Vercel login (pnpm exec vercel login) plus a linked project (pnpm exec vercel link).
 #
 # To deploy without modifying the YAML, run deploy-config.sh directly:
 #   scripts/deploy-config.sh --env=staging
@@ -19,7 +21,7 @@
 # Sensitive values must NEVER be passed as KEY=value arguments — they will appear
 # in shell history and ps output. Use `vercel env add` directly for secrets.
 #
-# Requires: node
+# Requires: node (+ pnpm/vercel devDep when using --sync)
 
 set -euo pipefail
 

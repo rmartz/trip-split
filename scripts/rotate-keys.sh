@@ -70,7 +70,7 @@ done
 
 echo "Checking prerequisites..."
 
-VERCEL="pnpm exec vercel"
+vercel() { pnpm exec vercel "$@"; }
 
 # Determine whether any target environment has Sentry configured
 SENTRY_NEEDED=false
@@ -98,7 +98,15 @@ if ! gcloud auth list --filter=status:ACTIVE --format="value(account)" 2>/dev/nu
   exit 1
 fi
 
-if ! $VERCEL whoami &>/dev/null 2>&1; then
+if ! command -v pnpm &>/dev/null; then
+  echo "ERROR: pnpm not found. Install it from https://pnpm.io/installation"
+  exit 1
+fi
+if ! pnpm exec vercel --version &>/dev/null 2>&1; then
+  echo "ERROR: vercel not found in node_modules. Run: pnpm install"
+  exit 1
+fi
+if ! vercel whoami &>/dev/null 2>&1; then
   echo "ERROR: Not authenticated with Vercel. Run: pnpm exec vercel login"
   exit 1
 fi
@@ -215,20 +223,20 @@ rotate_environment() {
   # Update Vercel
   echo "4. Updating Vercel ($vercel_env)..."
   for key in FIREBASE_CLIENT_EMAIL FIREBASE_PRIVATE_KEY; do
-    $VERCEL env rm "$key" "$vercel_env" --yes 2>/dev/null || true
+    vercel env rm "$key" "$vercel_env" --yes 2>/dev/null || true
   done
-  echo "$new_client_email" | $VERCEL env add FIREBASE_CLIENT_EMAIL "$vercel_env"
-  echo "$new_private_key"  | $VERCEL env add FIREBASE_PRIVATE_KEY "$vercel_env"
+  echo "$new_client_email" | vercel env add FIREBASE_CLIENT_EMAIL "$vercel_env"
+  echo "$new_private_key"  | vercel env add FIREBASE_PRIVATE_KEY "$vercel_env"
 
   if [[ -n "$new_sentry_token" ]]; then
-    $VERCEL env rm SENTRY_AUTH_TOKEN "$vercel_env" --yes 2>/dev/null || true
-    echo "$new_sentry_token" | $VERCEL env add SENTRY_AUTH_TOKEN "$vercel_env"
+    vercel env rm SENTRY_AUTH_TOKEN "$vercel_env" --yes 2>/dev/null || true
+    echo "$new_sentry_token" | vercel env add SENTRY_AUTH_TOKEN "$vercel_env"
   fi
 
   # Trigger redeploy and wait
   echo "5. Triggering Vercel redeploy..."
   local deploy_url
-  deploy_url=$($VERCEL deploy --target="$vercel_env" --yes 2>/dev/null | tail -1)
+  deploy_url=$(vercel deploy --target="$vercel_env" --yes 2>/dev/null | tail -1)
   echo "   Deployed: $deploy_url"
 
   echo "   Waiting for deployment to become healthy..."
@@ -236,7 +244,7 @@ rotate_environment() {
   local max_attempts=30
   while [[ $attempts -lt $max_attempts ]]; do
     local state
-    state=$($VERCEL inspect "$deploy_url" --json 2>/dev/null | jq -r '.readyState // "BUILDING"')
+    state=$(vercel inspect "$deploy_url" --json 2>/dev/null | jq -r '.readyState // "BUILDING"')
     if [[ "$state" == "READY" ]]; then
       echo "   Deployment healthy."
       break

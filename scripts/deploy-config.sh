@@ -40,37 +40,35 @@ fi
 
 # ── Prerequisites ─────────────────────────────────────────────────────────────
 
+if ! command -v pnpm &>/dev/null; then
+  echo "ERROR: pnpm not found. Install it from https://pnpm.io/installation"
+  exit 1
+fi
+if ! pnpm exec vercel --version &>/dev/null 2>&1; then
+  echo "ERROR: vercel not found in node_modules. Run: pnpm install"
+  exit 1
+fi
 if ! pnpm exec vercel whoami &>/dev/null 2>&1; then
   echo "ERROR: Not authenticated with Vercel. Run: pnpm exec vercel login"
   exit 1
 fi
 
-# Read auth token from the Vercel CLI config (macOS or Linux path)
-VERCEL_TOKEN=$(node -e "
-  const fs = require('fs');
-  const os = require('os');
-  const paths = [
-    os.homedir() + '/Library/Application Support/com.vercel.cli/auth.json',
-    os.homedir() + '/.local/share/com.vercel.cli/auth.json',
-  ];
-  for (const p of paths) {
-    if (fs.existsSync(p)) {
-      const a = JSON.parse(fs.readFileSync(p, 'utf8'));
-      const t = (a.token && typeof a.token === 'object') ? Object.values(a.token)[0] : a.token;
-      if (t) { process.stdout.write(t); break; }
-    }
-  }
-")
-if [[ -z "$VERCEL_TOKEN" ]]; then
-  echo "ERROR: Could not read Vercel auth token. Run: pnpm exec vercel login"
+# Read project and org IDs from the linked .vercel/project.json
+VERCEL_PROJECT_FILE="$PROJECT_ROOT/.vercel/project.json"
+if [[ ! -f "$VERCEL_PROJECT_FILE" ]]; then
+  echo "ERROR: .vercel/project.json not found. Run: pnpm exec vercel link"
   exit 1
 fi
-
-# Read project and org IDs from the linked .vercel/project.json
-VERCEL_PROJECT_ID=$(node -e "process.stdout.write(JSON.parse(require('fs').readFileSync('$PROJECT_ROOT/.vercel/project.json','utf8')).projectId)")
-VERCEL_ORG_ID=$(node -e "process.stdout.write(JSON.parse(require('fs').readFileSync('$PROJECT_ROOT/.vercel/project.json','utf8')).orgId)")
+VERCEL_PROJECT_ID=$(node -e "
+  const j = JSON.parse(require('fs').readFileSync(process.argv[1], 'utf8'));
+  process.stdout.write(j.projectId || '');
+" "$VERCEL_PROJECT_FILE")
+VERCEL_ORG_ID=$(node -e "
+  const j = JSON.parse(require('fs').readFileSync(process.argv[1], 'utf8'));
+  process.stdout.write(j.orgId || '');
+" "$VERCEL_PROJECT_FILE")
 if [[ -z "$VERCEL_PROJECT_ID" || -z "$VERCEL_ORG_ID" ]]; then
-  echo "ERROR: .vercel/project.json not found or missing IDs. Run: pnpm exec vercel link"
+  echo "ERROR: .vercel/project.json is missing projectId or orgId. Run: pnpm exec vercel link"
   exit 1
 fi
 
@@ -90,9 +88,9 @@ CONFIG_FILE="$CONFIG_FILE" \
 VERCEL_ENV="$VERCEL_ENV" \
 VERCEL_PROJECT_ID="$VERCEL_PROJECT_ID" \
 VERCEL_ORG_ID="$VERCEL_ORG_ID" \
-VERCEL_TOKEN="$VERCEL_TOKEN" \
 node <<'NODE'
 const fs = require('fs');
+const os = require('os');
 const https = require('https');
 
 const {
@@ -100,8 +98,30 @@ const {
   VERCEL_ENV: vercelEnv,
   VERCEL_PROJECT_ID: projectId,
   VERCEL_ORG_ID: orgId,
-  VERCEL_TOKEN: token,
 } = process.env;
+
+// Read auth token directly from the Vercel CLI config so it never appears in
+// a child-process environment variable (which could be inspected by other users).
+function readVercelToken() {
+  const authPaths = [
+    os.homedir() + '/Library/Application Support/com.vercel.cli/auth.json',
+    os.homedir() + '/.local/share/com.vercel.cli/auth.json',
+  ];
+  for (const p of authPaths) {
+    if (fs.existsSync(p)) {
+      const a = JSON.parse(fs.readFileSync(p, 'utf8'));
+      const t = (a.token && typeof a.token === 'object') ? Object.values(a.token)[0] : a.token;
+      if (t) return t;
+    }
+  }
+  return null;
+}
+
+const token = readVercelToken();
+if (!token) {
+  process.stderr.write('ERROR: Could not read Vercel auth token. Run: pnpm exec vercel login\n');
+  process.exit(1);
+}
 
 const content = fs.readFileSync(configFile, 'utf8');
 const lines = content.split('\n');
