@@ -25,17 +25,16 @@ paths = [
 ]
 
 [[allowlists]]
-description = "Firebase Client SDK API keys in deployment YAML — public browser keys, access-controlled by Firebase security rules"
-# These are NEXT_PUBLIC_FIREBASE_API_KEY values, intentionally committed to deployment/
+description = "Firebase Client SDK API keys in deployment config — public browser keys, access-controlled by Firebase security rules"
+# These are NEXT_PUBLIC_FIREBASE_API_KEY values intentionally committed to deployment/
 # config files so deploy-config.sh can push them to Vercel. They are not service account
 # credentials and cannot be used to access Firebase data without a matching security rule.
-regexTarget = "line"
-regexes = [
-  '''NEXT_PUBLIC_FIREBASE_API_KEY''',
-]
+# Covers both YAML files (current) and the ephemeral JSON exports (now deleted, still in git history).
 paths = [
   '''deployment/staging\.yml''',
   '''deployment/production\.yml''',
+  '''deployment/staging\.json''',
+  '''deployment/production\.json''',
 ]
 
 # Project-specific rules for secrets not covered by the default ruleset
