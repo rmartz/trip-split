@@ -6,9 +6,10 @@ import { useEffect } from "react";
 
 interface GlobalErrorProps {
   error: Error & { digest?: string };
+  reset: () => void;
 }
 
-export default function GlobalError({ error }: GlobalErrorProps) {
+export default function GlobalError({ error, reset }: GlobalErrorProps) {
   useEffect(() => {
     Sentry.captureException(error);
   }, [error]);
@@ -21,6 +22,7 @@ export default function GlobalError({ error }: GlobalErrorProps) {
         does not expose status codes for errors, we simply pass 0 to render a
         generic error message. */}
         <NextError statusCode={0} />
+        <button onClick={reset}>Try again</button>
       </body>
     </html>
   );
