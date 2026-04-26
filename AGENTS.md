@@ -15,7 +15,19 @@ pnpm test             # Run tests with Vitest
 pnpm typecheck        # Type check
 pnpm storybook        # Start Storybook dev server (port 6006)
 pnpm build-storybook  # Build static Storybook
+pnpm env:pull         # Pull .env.local from Vercel (staging)
+pnpm env:validate     # Validate deployment config files against schema
+pnpm secrets-check    # Run secret scan (deployment config validation + gitleaks)
 ```
+
+## Deployment Config
+
+Public (non-sensitive) environment variables are committed to `deployment/{env}.yml` and validated against `deployment/schema.yml`. This keeps the diff reviewable and prevents accidental secret exposure.
+
+- **Never** put secrets, private keys, auth tokens, or DSNs in `deployment/` files — the pre-commit hook and CI will reject them.
+- To populate values for a new environment, run `scripts/update-config.sh --env=staging --firebase-config=/path/to/config.json`. To deploy to Vercel afterward, run `scripts/deploy-config.sh --env=staging` (or pass `--sync` to update-config.sh to do both in one step).
+- Sensitive variables (Firebase private key, Sentry auth token) are managed directly in Vercel and never committed. Run `pnpm env:pull` to get a local `.env.local`.
+- To rotate credentials: `scripts/rotate-keys.sh --env=staging` (or `--env=production`). The script creates new credentials, updates Vercel, waits for a healthy deployment, then decommissions the old ones.
 
 ## Project Overview
 
@@ -52,7 +64,7 @@ src/
 ## File Organization
 
 - **Source files**: Keep under ~200 lines (split at ~240). Large files should be split by logical concern.
-- **Test files**: Keep under ~300 lines (split at ~360). Use `.spec.ts` / `.spec.tsx` extension. When splitting, organize into a `{module}-tests/` directory with domain-specific files.
+- **Test files**: Keep under ~300 lines (split at ~360). Use `.spec.ts` / `.spec.tsx` extension (not `.test.ts`). When splitting, organize into a `{module}-tests/` directory with domain-specific files.
 - **Components**: A component file contains its primary component and props interface. A sub-component may be co-located in the same file if it owns no hooks, state, effects, or context, and is used only by the parent component in that file. A sub-component must be in its own file when any of these are true: it owns hooks, state, effects, or context; it is referenced from multiple parents; or it is substantial enough to warrant its own stories or tests. All component props must be defined as an explicitly named interface (e.g., `interface TripCardProps`), never inline in the function signature.
 - **Type files**: Convert large type files into barrel-exported directories with one file per logical domain.
 - **Utility files**: Split by the type of operation or domain they serve.
@@ -65,9 +77,9 @@ src/
 - **Favor type inference.** Explicit generic type arguments (e.g., `someFn<Foo>(...)`) are a code smell when TypeScript can infer them.
 - **No spurious variables.** Do not assign a value to a variable only to immediately return it on the next line — return the expression directly instead.
 - **No IIFEs.** Do not use immediately-invoked function expressions. Extract the logic into a named helper function or compute the value with a plain expression instead.
-- **No function-style imports.** Do not use inline `import("…").Type` syntax in type annotations. Use module-level `import type { … } from "…"` statements at the top of the file.
-- **No unnecessary helpers.** Do not extract logic into a helper function unless it separates significant logic or belongs in a different module.
-- **Prefer enums over string literal unions** for any domain concept with two or more named states (e.g., use `enum SplitType { Equal = "equal", Itemized = "itemized" }` rather than `"equal" | "itemized"`). String enum values must match existing serialized literals so Firebase data round-trips without migration.
+- **No function-style imports.** Do not use inline `import("…").Type` syntax in type annotations. Use module-level `import type { … } from "…"` statements at the top of the file. Exception: dynamic `await import(…)` for Sentry instrumentation (required by the Next.js Sentry integration) is acceptable.
+- **No unnecessary helpers.** Do not extract logic into a helper function unless it separates significant logic or belongs in a different module. Three similar lines is better than a premature abstraction.
+- **Prefer enums over string literal unions** for any domain concept with two or more named states (e.g., use `enum SplitType { Equal = "equal", Itemized = "itemized" }` rather than `"equal" | "itemized"`). String enum values must match existing serialized literals so Firebase data round-trips without migration. When a module exports multiple enums, barrel-export them from an `index.ts` so callers use a single import path.
 - **Enums and constant objects** should be kept in alphabetical order to minimize merge conflicts.
 - Format currency using the `formatCurrency` utility from `@/lib/format`, never manually.
 
