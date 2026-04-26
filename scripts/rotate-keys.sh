@@ -12,9 +12,11 @@
 # All rotation credentials come from local user auth — nothing stored in Vercel:
 #   Firebase:  gcloud auth login
 #   Sentry:    sentry-cli login  (or SENTRY_AUTH_TOKEN in shell)
-#   Vercel:    vercel login
+#   Vercel:    pnpm exec vercel login
 #
-# Requires: gcloud, sentry-cli, vercel, jq
+# Requires: gcloud, jq, curl
+# vercel is a project devDependency — use via pnpm exec vercel
+# sentry-cli is required only when SENTRY_ORG is configured in a target environment
 
 set -euo pipefail
 
@@ -70,7 +72,7 @@ done
 
 echo "Checking prerequisites..."
 
-vercel() { pnpm exec vercel "$@"; }
+VERCEL="pnpm exec vercel"
 
 # Determine whether any target environment has Sentry configured
 SENTRY_NEEDED=false
@@ -82,10 +84,11 @@ for env in "${ENVS_TO_ROTATE[@]}"; do
   fi
 done
 
-for tool in gcloud jq; do
+for tool in curl gcloud jq; do
   if ! command -v "$tool" &>/dev/null; then
     echo "ERROR: $tool not found."
     case "$tool" in
+      curl)   echo "  Install: brew install curl" ;;
       gcloud) echo "  Install: https://cloud.google.com/sdk/docs/install" ;;
       jq)     echo "  Install: brew install jq" ;;
     esac
@@ -106,7 +109,7 @@ if ! pnpm exec vercel --version &>/dev/null 2>&1; then
   echo "ERROR: vercel not found in node_modules. Run: pnpm install"
   exit 1
 fi
-if ! vercel whoami &>/dev/null 2>&1; then
+if ! $VERCEL whoami &>/dev/null 2>&1; then
   echo "ERROR: Not authenticated with Vercel. Run: pnpm exec vercel login"
   exit 1
 fi
@@ -134,6 +137,30 @@ fi
 echo "All prerequisites met."
 echo ""
 
+# ── Shared-project guard ─────────────────────────────────────────────────────
+# If two environments share a FIREBASE_PROJECT_ID, rotating both in one run
+# will delete the first environment's new key during the second rotation
+# (it appears "old" relative to that run's OLD_KEY_IDS snapshot).
+# Require separate --env= invocations when a project ID is shared.
+
+declare -A SEEN_PROJECT_IDS=()
+for env in "${ENVS_TO_ROTATE[@]}"; do
+  config_file="$DEPLOYMENT_DIR/$env.yml"
+  project_id=$(grep "^  FIREBASE_PROJECT_ID:" "$config_file" | sed 's/.*: *//' | tr -d "\"' ")
+  if [[ -z "$project_id" ]]; then
+    continue  # Missing project ID is caught with a clearer error inside rotate_environment()
+  fi
+  if [[ -n "${SEEN_PROJECT_IDS[$project_id]+x}" ]]; then
+    echo "ERROR: FIREBASE_PROJECT_ID \"$project_id\" is shared between environments: ${SEEN_PROJECT_IDS[$project_id]} and $env."
+    echo "Rotating both in one run would delete the first environment's new key during"
+    echo "the second rotation. Rotate each environment separately instead:"
+    echo "  scripts/rotate-keys.sh --env=${SEEN_PROJECT_IDS[$project_id]}"
+    echo "  scripts/rotate-keys.sh --env=$env"
+    exit 1
+  fi
+  SEEN_PROJECT_IDS[$project_id]="$env"
+done
+
 # ── Per-environment rotation ──────────────────────────────────────────────────
 
 rotate_environment() {
@@ -152,10 +179,8 @@ rotate_environment() {
   echo " Rotating $env"
   echo "══════════════════════════════════════════"
 
-  # Read project config
-  # Extract value after the colon and strip optional surrounding quotes (both ' and ").
-  # This handles both quoted values written by update-config.sh and manually-edited
-  # unquoted values, which are equally valid YAML.
+  # Read project config.
+  # sed handles both quoted ("value") and unquoted (value) YAML values.
   local project_id
   project_id=$(grep "^  FIREBASE_PROJECT_ID:" "$config_file" | sed 's/.*: *//' | tr -d "\"' ")
   if [[ -z "$project_id" ]]; then
@@ -179,7 +204,8 @@ rotate_environment() {
     exit 1
   fi
 
-  # Capture the current key IDs before creating new ones
+  # Capture the current key IDs before creating new ones.
+  # while IFS= read -r is used instead of mapfile -t for Bash 3.x compatibility (macOS default).
   echo "1. Capturing existing Firebase key IDs..."
   OLD_KEY_IDS=()
   while IFS= read -r line; do OLD_KEY_IDS+=("$line"); done < <(gcloud iam service-accounts keys list \
@@ -210,9 +236,9 @@ rotate_environment() {
       -H "Authorization: Bearer $SENTRY_TOKEN" \
       -H "Content-Type: application/json" \
       -d "{\"scopes\":[\"project:releases\",\"project:read\",\"org:read\"]}" \
-      "https://sentry.io/api/0/api-tokens/" | jq -r '.token')
+      "https://sentry.io/api/0/api-tokens/" | jq -r '.token' || true)
     if [[ -z "$new_sentry_token" || "$new_sentry_token" == "null" ]]; then
-      echo "WARNING: Could not create Sentry token (check token scopes). Skipping Sentry rotation."
+      echo "WARNING: Could not create Sentry token (HTTP/network/API/parsing failure, or insufficient token scopes). Skipping Sentry rotation."
       new_sentry_token=""
     fi
   else
@@ -223,20 +249,20 @@ rotate_environment() {
   # Update Vercel
   echo "4. Updating Vercel ($vercel_env)..."
   for key in FIREBASE_CLIENT_EMAIL FIREBASE_PRIVATE_KEY; do
-    vercel env rm "$key" "$vercel_env" --yes 2>/dev/null || true
+    $VERCEL env rm "$key" "$vercel_env" --yes 2>/dev/null || true
   done
-  echo "$new_client_email" | vercel env add FIREBASE_CLIENT_EMAIL "$vercel_env"
-  echo "$new_private_key"  | vercel env add FIREBASE_PRIVATE_KEY "$vercel_env"
+  printf '%s\n' "$new_client_email" | $VERCEL env add FIREBASE_CLIENT_EMAIL "$vercel_env"
+  printf '%s\n' "$new_private_key"  | $VERCEL env add FIREBASE_PRIVATE_KEY "$vercel_env"
 
   if [[ -n "$new_sentry_token" ]]; then
-    vercel env rm SENTRY_AUTH_TOKEN "$vercel_env" --yes 2>/dev/null || true
-    echo "$new_sentry_token" | vercel env add SENTRY_AUTH_TOKEN "$vercel_env"
+    $VERCEL env rm SENTRY_AUTH_TOKEN "$vercel_env" --yes 2>/dev/null || true
+    printf '%s\n' "$new_sentry_token" | $VERCEL env add SENTRY_AUTH_TOKEN "$vercel_env"
   fi
 
   # Trigger redeploy and wait
   echo "5. Triggering Vercel redeploy..."
   local deploy_url
-  deploy_url=$(vercel deploy --target="$vercel_env" --yes 2>/dev/null | tail -1)
+  deploy_url=$($VERCEL deploy --target="$vercel_env" --yes 2>/dev/null | tail -1)
   echo "   Deployed: $deploy_url"
 
   echo "   Waiting for deployment to become healthy..."
@@ -244,7 +270,7 @@ rotate_environment() {
   local max_attempts=30
   while [[ $attempts -lt $max_attempts ]]; do
     local state
-    state=$(vercel inspect "$deploy_url" --json 2>/dev/null | jq -r '.readyState // "BUILDING"')
+    state=$($VERCEL inspect "$deploy_url" --json 2>/dev/null | jq -r '.readyState // "BUILDING"')
     if [[ "$state" == "READY" ]]; then
       echo "   Deployment healthy."
       break

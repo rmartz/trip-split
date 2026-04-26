@@ -8,20 +8,19 @@
 #
 # The --firebase-config flag accepts the path to a JSON file containing the
 # firebaseConfig object exported from the Firebase console. It extracts and maps
-# the relevant NEXT_PUBLIC_FIREBASE_* keys automatically.
+# the relevant NEXT_PUBLIC_FIREBASE_* keys automatically. Both strict JSON and
+# the JavaScript object literal format produced by the Firebase console are accepted.
 #
 # Pass --sync to also push the updated values to Vercel immediately after writing
 # the YAML (calls deploy-config.sh). Without --sync, only the local YAML is updated.
-# --sync requires: pnpm, the vercel devDependency (pnpm install), and an active
-# Vercel login (pnpm exec vercel login) plus a linked project (pnpm exec vercel link).
 #
 # To deploy without modifying the YAML, run deploy-config.sh directly:
 #   scripts/deploy-config.sh --env=staging
 #
 # Sensitive values must NEVER be passed as KEY=value arguments — they will appear
-# in shell history and ps output. Use `vercel env add` directly for secrets.
+# in shell history and ps output. Use `pnpm exec vercel env add` directly for secrets.
 #
-# Requires: node (+ pnpm/vercel devDep when using --sync)
+# Requires: node
 
 set -euo pipefail
 
@@ -68,7 +67,9 @@ if [[ -n "$FIREBASE_CONFIG_FILE" ]]; then
   while IFS="=" read -r key value; do
     KEY_VALUE_PAIRS+=("$key=$value")
   done < <(FIREBASE_CONFIG_PATH="$FIREBASE_CONFIG_FILE" node -e "
-    const cfg = JSON.parse(require('fs').readFileSync(process.env.FIREBASE_CONFIG_PATH, 'utf8'));
+    const raw = require('fs').readFileSync(process.env.FIREBASE_CONFIG_PATH, 'utf8').trim().replace(/;\s*\$/, '');
+    let cfg;
+    try { cfg = JSON.parse(raw); } catch { cfg = new Function('return (' + raw + ')')(); }
     const map = {
       apiKey: 'NEXT_PUBLIC_FIREBASE_API_KEY',
       authDomain: 'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
@@ -89,6 +90,60 @@ if [[ ${#KEY_VALUE_PAIRS[@]} -eq 0 ]]; then
   echo "ERROR: No key=value pairs provided and no --firebase-config specified."
   exit 1
 fi
+
+# ── Pre-validate proposed keys against schema ─────────────────────────────────
+# Validate before writing anything — prevents a dirty working tree when a
+# denied or unknown key is passed.
+
+SCHEMA_FILE="$DEPLOYMENT_DIR/schema.yml"
+KEYS_TO_CHECK=()
+for pair in "${KEY_VALUE_PAIRS[@]}"; do
+  KEYS_TO_CHECK+=("${pair%%=*}")
+done
+
+node - "$SCHEMA_FILE" "${KEYS_TO_CHECK[@]}" <<'NODE'
+const fs = require('fs');
+const [, , schemaFile, ...keys] = process.argv;
+
+function parseYamlList(content, listKey) {
+  const lines = content.split('\n');
+  const items = [];
+  let inList = false;
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith(listKey + ':')) { inList = true; continue; }
+    if (inList) {
+      if (trimmed.startsWith('- ')) {
+        items.push(trimmed.slice(2).replace(/#.*$/, '').replace(/^["']|["']$/g, '').trim());
+      } else if (trimmed && !trimmed.startsWith('#')) {
+        inList = false;
+      }
+    }
+  }
+  return items;
+}
+
+function globMatch(pattern, key) {
+  return new RegExp('^' + pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$').test(key);
+}
+
+const content = fs.readFileSync(schemaFile, 'utf8');
+const allowedPatterns = parseYamlList(content, 'allowed_patterns');
+const allowedKeys = parseYamlList(content, 'allowed_keys');
+const deniedPatterns = parseYamlList(content, 'denied_patterns');
+
+let failed = false;
+for (const key of keys) {
+  if (deniedPatterns.some(p => globMatch(p, key))) {
+    process.stderr.write(`ERROR: Key ${key} matches a denied_pattern in schema.yml\n`);
+    failed = true;
+  } else if (!allowedPatterns.some(p => globMatch(p, key)) && !allowedKeys.includes(key)) {
+    process.stderr.write(`ERROR: Key ${key} is not in allowed_patterns or allowed_keys in schema.yml\n`);
+    failed = true;
+  }
+}
+if (failed) process.exit(1);
+NODE
 
 # ── Update YAML in place ──────────────────────────────────────────────────────
 
