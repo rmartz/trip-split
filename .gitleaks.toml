@@ -23,18 +23,13 @@ regexes = [
 paths = [
   ".env.example",
 ]
-
-[[allowlists]]
-description = "Firebase Client SDK API keys in deployment config — public browser keys, access-controlled by Firebase security rules"
-# These are NEXT_PUBLIC_FIREBASE_API_KEY values intentionally committed to deployment/
-# config files so deploy-config.sh can push them to Vercel. They are not service account
-# credentials and cannot be used to access Firebase data without a matching security rule.
-# Covers both YAML files (current) and the ephemeral JSON exports (now deleted, still in git history).
-paths = [
-  '''deployment/staging\.yml''',
-  '''deployment/production\.yml''',
-  '''deployment/staging\.json''',
-  '''deployment/production\.json''',
+# Commit that introduced Firebase Client SDK API keys into deployment/ config files.
+# These are public browser keys (NEXT_PUBLIC_FIREBASE_*), not service account credentials —
+# access control is enforced by Firebase security rules, not by keeping the key private.
+# The [[allowlists]] array syntax is silently ignored in gitleaks v8; commits here is the
+# reliable way to suppress findings from a known-safe commit.
+commits = [
+  "528ce30405d04a57880b48035837a516ad6cf3b2",
 ]
 
 # Project-specific rules for secrets not covered by the default ruleset
