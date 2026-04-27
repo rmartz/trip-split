@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/components/auth";
 import { useAddExpenseMutation, useMembers } from "@/lib/hooks";
-import { SplitType } from "@/types";
+import type { ExpenseFormSubmitData } from "@/types";
 import { ADD_EXPENSE_COPY } from "./AddExpenseFormView.copy";
 import { AddExpenseFormView } from "./AddExpenseFormView";
 
@@ -15,12 +15,7 @@ export function AddExpenseContent({ tripId }: AddExpenseContentProps) {
   const { data: members = [], isLoading } = useMembers(tripId);
   const mutation = useAddExpenseMutation();
 
-  const handleSubmit = (
-    description: string,
-    totalAmountCents: number,
-    paidByMemberId: string,
-    splitAmong: string[],
-  ) => {
+  const handleSubmit = (data: ExpenseFormSubmitData) => {
     if (!user) return;
 
     mutation.mutate({
@@ -28,11 +23,14 @@ export function AddExpenseContent({ tripId }: AddExpenseContentProps) {
       expense: {
         createdBy: user.uid,
         currency: "USD",
-        description,
-        paidByMemberId,
-        splitAmong,
-        splitType: SplitType.Equal,
-        totalAmountCents,
+        description: data.description,
+        items: data.items,
+        paidByMemberId: data.paidByMemberId,
+        splitAmong: data.splitAmong,
+        splitType: data.splitType,
+        taxCents: data.taxCents,
+        tipCents: data.tipCents,
+        totalAmountCents: data.totalAmountCents,
       },
     });
   };

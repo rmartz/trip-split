@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import type { Expense, TripMember } from "@/types";
 import { SplitType } from "@/types";
+import type { Expense, TripMember } from "@/types";
 
 import { EXPENSE_LIST_VIEW_COPY } from "./ExpenseListView.copy";
 import { ExpenseListView } from "./ExpenseListView";
