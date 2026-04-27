@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+import { SplitType } from "@/types";
 import type { Expense, TripMember } from "@/types";
 
 import { EXPENSE_LIST_VIEW_COPY } from "./ExpenseListView.copy";
@@ -15,7 +16,7 @@ function makeExpense(overrides?: Partial<Expense>): Expense {
     id: "expense-1",
     paidByMemberId: "member-1",
     splitAmong: ["member-1", "member-2"],
-    splitType: "equal",
+    splitType: SplitType.Equal,
     totalAmountCents: 5000,
     updatedAt: new Date("2026-03-15T10:00:00Z"),
     ...overrides,

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
+import { SplitType } from "@/types";
 import type { Expense } from "@/types";
 
 import { EXPENSE_CARD_COPY } from "./ExpenseCard.copy";
@@ -15,7 +16,7 @@ function makeExpense(overrides?: Partial<Expense>): Expense {
     id: "expense-1",
     paidByMemberId: "member-1",
     splitAmong: ["member-1", "member-2", "member-3"],
-    splitType: "equal",
+    splitType: SplitType.Equal,
     totalAmountCents: 12050,
     updatedAt: new Date("2026-03-15T10:00:00Z"),
     ...overrides,
