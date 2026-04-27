@@ -25,6 +25,7 @@ variables:
   # Firebase Admin SDK — project identifier only, not a credential
   FIREBASE_PROJECT_ID: ""
 
-  # Sentry — slugs only, not credentials
+  # Sentry — slugs only, not credentials; DSN is public (NEXT_PUBLIC_*) so safe to commit
+  NEXT_PUBLIC_SENTRY_DSN: ""
   SENTRY_ORG: ""
   SENTRY_PROJECT: ""
