@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import type { Expense, TripMember } from "@/types";
 import { SplitType } from "@/types";
+import type { Expense, TripMember } from "@/types";
 
 import { ExpenseListView } from "./ExpenseListView";
 
