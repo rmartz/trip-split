@@ -1,0 +1,31 @@
+# Public environment variables for the staging environment.
+#
+# Only non-sensitive variables belong here. All keys are validated against
+# deployment/schema.yml — sensitive variables (private keys, auth tokens, DSNs)
+# will be rejected by the pre-commit hook and CI.
+#
+# Sensitive variables are managed directly in Vercel and are never committed.
+# Run `pnpm env:pull` to generate a local .env.local from Vercel's stored values.
+#
+# To update values: scripts/update-config.sh --env=staging KEY=value (or --firebase-config=...)
+# To deploy to Vercel: scripts/deploy-config.sh --env=staging
+
+environment: staging
+
+variables:
+  # Firebase Client SDK — safe to expose; access control is enforced by Firebase security rules
+  NEXT_PUBLIC_FIREBASE_API_KEY: "AIzaSyDu7JOqWCcay1ioB0_kR5CjNpzxTLFRLlo"
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: "trip-split-staging.firebaseapp.com"
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: "trip-split-staging"
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: "trip-split-staging.firebasestorage.app"
+  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "344480940938"
+  NEXT_PUBLIC_FIREBASE_APP_ID: "1:344480940938:web:8d0c7ef79d1915d7f8be73"
+  NEXT_PUBLIC_FIREBASE_DATABASE_URL: ""
+
+  # Firebase Admin SDK — project identifier only, not a credential
+  FIREBASE_PROJECT_ID: "trip-split-staging"
+
+  # Sentry — slugs only, not credentials; DSN is public (NEXT_PUBLIC_*) so safe to commit
+  NEXT_PUBLIC_SENTRY_DSN: ""
+  SENTRY_ORG: ""
+  SENTRY_PROJECT: ""
