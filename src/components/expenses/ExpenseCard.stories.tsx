@@ -34,24 +34,39 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
+    canEdit: false,
     expense: makeExpense(),
     paidByName: "Alice",
+    tripId: "trip-1",
   },
 };
 
 export const SinglePerson: Story = {
   args: {
+    canEdit: false,
     expense: makeExpense({ splitAmong: ["member-1"] }),
     paidByName: "Bob",
+    tripId: "trip-1",
   },
 };
 
 export const LargeAmount: Story = {
   args: {
+    canEdit: false,
     expense: makeExpense({
       totalAmountCents: 150000,
       description: "Hotel stay",
     }),
     paidByName: "Charlie",
+    tripId: "trip-1",
+  },
+};
+
+export const WithEditActions: Story = {
+  args: {
+    canEdit: true,
+    expense: makeExpense(),
+    paidByName: "Alice",
+    tripId: "trip-1",
   },
 };

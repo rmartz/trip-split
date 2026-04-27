@@ -10,6 +10,7 @@ import { MemberList } from "./MemberList";
 import { TRIP_DETAIL_COPY } from "./TripDetail.copy";
 
 interface TripDetailViewProps {
+  currentUserId?: string;
   expenses: Expense[];
   isAddingMember: boolean;
   isCreator: boolean;
@@ -17,11 +18,13 @@ interface TripDetailViewProps {
   isExpensesLoading: boolean;
   members: TripMember[];
   onAddMember: (name: string) => void;
+  onDeleteExpense: (expenseId: string) => void;
   onDeleteTrip: () => void;
   trip: Trip;
 }
 
 export function TripDetailView({
+  currentUserId,
   expenses,
   isAddingMember,
   isCreator,
@@ -29,6 +32,7 @@ export function TripDetailView({
   isExpensesLoading,
   members,
   onAddMember,
+  onDeleteExpense,
   onDeleteTrip,
   trip,
 }: TripDetailViewProps) {
@@ -72,9 +76,13 @@ export function TripDetailView({
         </div>
         <div className="mt-3">
           <ExpenseListView
+            currentUserId={currentUserId}
             expenses={expenses}
             isLoading={isExpensesLoading}
             members={members}
+            onDeleteExpense={onDeleteExpense}
+            tripCreatorId={trip.createdBy}
+            tripId={trip.id}
           />
         </div>
       </div>
