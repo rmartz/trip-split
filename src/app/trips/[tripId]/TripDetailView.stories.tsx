@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { fn } from "storybook/test";
 
-import type { Expense, Trip, TripMember } from "@/types";
 import { SplitType } from "@/types";
+import type { Expense, Trip, TripMember } from "@/types";
 import { TripDetailView } from "./TripDetailView";
 
 function makeTrip(overrides?: Partial<Trip>): Trip {

@@ -65,14 +65,24 @@ export async function updateExpense(
       Expense,
       | "currency"
       | "description"
+      | "items"
       | "paidByMemberId"
       | "splitAmong"
       | "splitType"
+      | "taxCents"
+      | "tipCents"
       | "totalAmountCents"
     >
   >,
 ): Promise<void> {
   const db = getDb();
+
+  // When switching to Equal split, null out itemized-only fields so
+  // previously stored values are cleared in Firebase.
+  const fieldsToClear =
+    updates.splitType === SplitType.Equal
+      ? { items: null, taxCents: null, tipCents: null }
+      : {};
 
   // Build a partial Firebase payload by converting only the supplied fields
   // through expenseToFirebase so any future field renames stay in sync.
@@ -95,6 +105,7 @@ export async function updateExpense(
   );
 
   await update(ref(db, `expenses/${tripId}/${expenseId}`), {
+    ...fieldsToClear,
     ...firebaseUpdates,
     updatedAt: new Date().toISOString(),
   });
