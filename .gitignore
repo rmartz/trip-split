@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# deployment — Firebase console JSON exports are ephemeral; never commit
+deployment/*.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

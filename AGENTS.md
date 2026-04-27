@@ -25,7 +25,7 @@ pnpm secrets-check    # Run secret scan (deployment config validation + gitleaks
 Public (non-sensitive) environment variables are committed to `deployment/{env}.yml` and validated against `deployment/schema.yml`. This keeps the diff reviewable and prevents accidental secret exposure.
 
 - **Never** put secrets, private keys, auth tokens, or DSNs in `deployment/` files — the pre-commit hook and CI will reject them.
-- To populate values for a new environment, run `scripts/update-config.sh --env=staging --firebase-config=/path/to/config.json`.
+- To populate values for a new environment, run `scripts/update-config.sh --env=staging --firebase-config=/path/to/config.json`. To deploy to Vercel afterward, run `scripts/deploy-config.sh --env=staging` (or pass `--sync` to update-config.sh to do both in one step).
 - Sensitive variables (Firebase private key, Sentry auth token) are managed directly in Vercel and never committed. Run `pnpm env:pull` to get a local `.env.local`.
 - To rotate credentials: `scripts/rotate-keys.sh --env=staging` (or `--env=production`). The script creates new credentials, updates Vercel, waits for a healthy deployment, then decommissions the old ones.
 
