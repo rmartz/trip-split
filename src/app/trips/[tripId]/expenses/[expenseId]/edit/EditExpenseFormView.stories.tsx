@@ -71,3 +71,24 @@ export const WithServerError: Story = {
     error: "Failed to save expense. Please try again.",
   },
 };
+
+export const ItemizedExpense: Story = {
+  args: {
+    expense: {
+      ...expense,
+      items: [
+        {
+          amountCents: 6025,
+          assignedTo: ["member-1", "member-2"],
+          description: "Main course",
+        },
+        {
+          amountCents: 6025,
+          assignedTo: ["member-2", "member-3"],
+          description: "Drinks",
+        },
+      ],
+      splitType: SplitType.Itemized,
+    },
+  },
+};

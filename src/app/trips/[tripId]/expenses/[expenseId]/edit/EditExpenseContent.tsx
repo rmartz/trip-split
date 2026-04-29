@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 
 import { useExpense, useMembers, useUpdateExpenseMutation } from "@/lib/hooks";
+import { SplitType } from "@/types";
 import { EDIT_EXPENSE_COPY } from "./EditExpenseFormView.copy";
 import { EditExpenseFormView } from "./EditExpenseFormView";
 
@@ -40,6 +41,7 @@ export function EditExpenseContent({
         description,
         paidByMemberId,
         splitAmong,
+        splitType: SplitType.Equal,
         totalAmountCents,
       },
     });

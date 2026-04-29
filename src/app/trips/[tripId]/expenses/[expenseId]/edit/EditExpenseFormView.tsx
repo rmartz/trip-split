@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { parseAmountCents } from "@/lib/parse-amount";
 import type { Expense, TripMember } from "@/types";
+import { SplitType } from "@/types";
 import { EDIT_EXPENSE_COPY } from "./EditExpenseFormView.copy";
 
 interface EditExpenseFormViewProps {
@@ -92,6 +93,11 @@ export function EditExpenseFormView({
           <CardDescription>{EDIT_EXPENSE_COPY.subtitle}</CardDescription>
         </CardHeader>
         <CardContent>
+          {expense.splitType === SplitType.Itemized && (
+            <p className="text-muted-foreground mb-4 text-sm">
+              {EDIT_EXPENSE_COPY.itemizedConversionNotice}
+            </p>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="expense-description">

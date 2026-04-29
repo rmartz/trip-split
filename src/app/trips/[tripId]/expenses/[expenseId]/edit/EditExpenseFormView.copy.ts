@@ -6,6 +6,8 @@ export const EDIT_EXPENSE_COPY = {
   descriptionLabel: "Description",
   descriptionPlaceholder: "e.g. Dinner, Hotel, Taxi",
   descriptionRequired: "Description is required",
+  itemizedConversionNotice:
+    "This is an itemized expense. Saving will convert it to an equal split and remove the line items.",
   loading: "Loading\u2026",
   notFound: "Expense not found.",
   paidByLabel: "Paid by",
