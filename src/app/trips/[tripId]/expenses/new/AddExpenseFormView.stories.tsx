@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, userEvent, within } from "storybook/test";
 
+import { SplitType } from "@/types";
 import { ADD_EXPENSE_COPY } from "./AddExpenseFormView.copy";
 import { AddExpenseFormView } from "./AddExpenseFormView";
 
@@ -93,11 +94,12 @@ export const SubmitsWithValidInput: Story = {
       canvas.getByRole("button", { name: ADD_EXPENSE_COPY.submitButton }),
     );
 
-    await expect(args.onSubmit).toHaveBeenCalledWith(
-      "Dinner at the restaurant",
-      12050,
-      "member-1",
-      ["member-1", "member-2", "member-3"],
-    );
+    await expect(args.onSubmit).toHaveBeenCalledWith({
+      description: "Dinner at the restaurant",
+      paidByMemberId: members[0].id,
+      splitAmong: members.map((m) => m.id),
+      splitType: SplitType.Equal,
+      totalAmountCents: 12050,
+    });
   },
 };
