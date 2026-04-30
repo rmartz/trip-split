@@ -1,5 +1,4 @@
-[extend]
-path = "node_modules/vercel-deploy-scripts/.gitleaks.toml"
+useDefault = true
 
 [allowlist]
 description = "Known safe patterns — placeholder values in documentation and config examples"
