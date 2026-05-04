@@ -4,13 +4,7 @@
 # deployment/{environment}.yml config file. This prevents accidental
 # misconfiguration where a repo expects separate staging and production
 # environments but is operating with only one.
-#
-# Set single_environment: true ONLY when this project intentionally uses
-# a single environment (e.g. ephemeral data with no meaningful staging/prod
-# distinction). The default is false — both environments must be present.
 
-environments:
+active:
   - staging
   - production
-
-single_environment: false

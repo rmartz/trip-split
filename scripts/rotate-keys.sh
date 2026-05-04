@@ -45,13 +45,12 @@ if [[ ! -f "$ENVIRONMENTS_FILE" ]]; then
   exit 1
 fi
 
-SINGLE_ENV=$(grep "^single_environment:" "$ENVIRONMENTS_FILE" | awk '{print $2}' || echo "false")
 CONFIGURED_ENVS=()
 while IFS= read -r line; do CONFIGURED_ENVS+=("$line"); done < <(grep "^  - " "$ENVIRONMENTS_FILE" | awk '{print $2}')
 
-if [[ "${#CONFIGURED_ENVS[@]}" -lt 2 && "$SINGLE_ENV" != "true" && "$FORCE_SINGLE" != "true" ]]; then
-  echo "ERROR: Only one environment is configured but single_environment is not true."
-  echo "Set single_environment: true in deployment/environments.yml, or pass --force-single."
+if [[ "${#CONFIGURED_ENVS[@]}" -lt 2 && "$FORCE_SINGLE" != "true" ]]; then
+  echo "ERROR: Only one environment is configured in deployment/environments.yml."
+  echo "Add the missing environment to the \`active:\` list, or pass --force-single."
   exit 1
 fi
 
