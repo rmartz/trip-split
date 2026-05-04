@@ -1,6 +1,10 @@
 export { useAddExpenseMutation } from "./useAddExpenseMutation";
 export { useAddMemberMutation } from "./useAddMemberMutation";
-export { useSignInMutation, useSignUpMutation } from "./useAuthMutation";
+export {
+  useSignInMutation,
+  useSignInWithGoogleMutation,
+  useSignUpMutation,
+} from "./useAuthMutation";
 export { useCreateTripMutation } from "./useCreateTripMutation";
 export { useDeleteTripMutation } from "./useDeleteTripMutation";
 export { useExpenses } from "./useExpenses";
