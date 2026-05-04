@@ -11,5 +11,7 @@ runs:
       with:
         node-version: 24.x
         cache: "pnpm"
+    - run: git config --global url."https://x-access-token:${{ github.token }}@github.com/".insteadOf "git@github.com:"
+      shell: bash
     - run: pnpm install --frozen-lockfile
       shell: bash
