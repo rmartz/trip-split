@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/components/auth";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   useAddMemberMutation,
   useDeleteTripMutation,
@@ -25,8 +26,14 @@ export function TripDetailContent({ tripId }: TripDetailContentProps) {
 
   if (isTripLoading) {
     return (
-      <div className="mx-auto w-full max-w-3xl px-4 py-8">
-        <p className="text-muted-foreground">{TRIP_DETAIL_COPY.loading}</p>
+      <div className="mx-auto w-full max-w-3xl space-y-4 px-4 py-8">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-4 w-64" />
+        <div className="mt-4 space-y-2">
+          <Skeleton className="h-14 w-full" />
+          <Skeleton className="h-14 w-full" />
+          <Skeleton className="h-14 w-full" />
+        </div>
       </div>
     );
   }
