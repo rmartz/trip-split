@@ -26,5 +26,6 @@ variables:
   FIREBASE_PROJECT_ID: "trip-split-staging"
 
   # Sentry — slugs only, not credentials
+  NEXT_PUBLIC_SENTRY_DSN: ""
   SENTRY_ORG: ""
   SENTRY_PROJECT: ""
