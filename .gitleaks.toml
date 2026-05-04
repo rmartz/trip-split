@@ -18,18 +18,13 @@ regexes = [
   '''firebase-adminsdk-xxx''',
   # Example/truncated keys in ARCHITECTURE.md and README
   '''xxx@o\w+\.ingest\.sentry\.io''',
-  # The .env.example file itself — it contains only placeholder values
 ]
 paths = [
+  # Contains only placeholder values
   ".env.example",
-]
-# Commit that introduced Firebase Client SDK API keys into deployment/ config files.
-# These are public browser keys (NEXT_PUBLIC_FIREBASE_*), not service account credentials —
-# access control is enforced by Firebase security rules, not by keeping the key private.
-# The [[allowlists]] array syntax is silently ignored in gitleaks v8; commits here is the
-# reliable way to suppress findings from a known-safe commit.
-commits = [
-  "528ce30405d04a57880b48035837a516ad6cf3b2",
+  # Contains only NEXT_PUBLIC_* Firebase client keys (intentionally public).
+  # Schema enforcement (deployment/schema.yml) hard-denies all secret patterns.
+  '''deployment/.*\.yml''',
 ]
 
 # Project-specific rules for secrets not covered by the default ruleset
