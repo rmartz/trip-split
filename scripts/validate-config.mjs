@@ -135,7 +135,7 @@ const toValidate = envArg ? [envArg] : environments;
 if (environments.length < 2 && !envArg) {
   console.error(
     "ERROR: environments.yml lists fewer than 2 active environments.\n" +
-      "Add missing environments or remove unused ones from deployment/environments.yml.",
+      "Add the missing environment entries to the `active:` list in deployment/environments.yml.",
   );
   process.exit(1);
 }
