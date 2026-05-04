@@ -1,0 +1,20 @@
+export const EDIT_EXPENSE_COPY = {
+  amountInvalid: "Enter a positive amount",
+  amountLabel: "Amount",
+  amountPlaceholder: "0.00",
+  cancelButton: "Cancel",
+  descriptionLabel: "Description",
+  descriptionPlaceholder: "e.g. Dinner, Hotel, Taxi",
+  descriptionRequired: "Description is required",
+  itemizedConversionNotice:
+    "This is an itemized expense. Saving will convert it to an equal split and remove the line items.",
+  loading: "Loading\u2026",
+  notFound: "Expense not found.",
+  paidByLabel: "Paid by",
+  savingButton: "Saving\u2026",
+  splitAmongLabel: "Split among",
+  splitAmongRequired: "Select at least one member",
+  submitButton: "Save Changes",
+  subtitle: "Update the details of this expense",
+  title: "Edit Expense",
+} as const;

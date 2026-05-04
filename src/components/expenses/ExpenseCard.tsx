@@ -1,14 +1,38 @@
+import { Pencil, Trash2 } from "lucide-react";
+import Link from "next/link";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/format";
 import type { Expense } from "@/types";
 
 import { EXPENSE_CARD_COPY } from "./ExpenseCard.copy";
 
 interface ExpenseCardProps {
+  canEdit: boolean;
   expense: Expense;
+  onDelete?: () => void;
   paidByName: string;
+  tripId: string;
 }
 
-export function ExpenseCard({ expense, paidByName }: ExpenseCardProps) {
+export function ExpenseCard({
+  canEdit,
+  expense,
+  onDelete,
+  paidByName,
+  tripId,
+}: ExpenseCardProps) {
   const formattedDate = expense.createdAt.toLocaleDateString("en-US", {
     day: "numeric",
     month: "short",
@@ -25,9 +49,55 @@ export function ExpenseCard({ expense, paidByName }: ExpenseCardProps) {
           {formattedDate}
         </span>
       </div>
-      <span className="text-sm font-semibold">
-        {formatCurrency(expense.totalAmountCents, expense.currency)}
-      </span>
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-semibold">
+          {formatCurrency(expense.totalAmountCents, expense.currency)}
+        </span>
+        {canEdit && (
+          <div className="flex items-center gap-1">
+            <Link
+              href={`/trips/${tripId}/expenses/${expense.id}/edit`}
+              aria-label={EXPENSE_CARD_COPY.editButton}
+              className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
+            >
+              <Pencil />
+            </Link>
+            {onDelete && (
+              <AlertDialog>
+                <AlertDialogTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={EXPENSE_CARD_COPY.deleteButton}
+                    />
+                  }
+                >
+                  <Trash2 />
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      {EXPENSE_CARD_COPY.deleteConfirmTitle}
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {EXPENSE_CARD_COPY.deleteConfirmDescription}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>
+                      {EXPENSE_CARD_COPY.deleteCancel}
+                    </AlertDialogCancel>
+                    <AlertDialogAction onClick={onDelete}>
+                      {EXPENSE_CARD_COPY.deleteButton}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
