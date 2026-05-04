@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { fn } from "storybook/test";
+import { expect, fn, userEvent, within } from "storybook/test";
 
+import { CREATE_TRIP_COPY } from "./CreateTripForm.copy";
 import { CreateTripFormView } from "./CreateTripFormView";
 
 const meta = {
@@ -33,5 +34,52 @@ export const WithError: Story = {
     error: "Something went wrong. Please try again.",
     isPending: false,
     onSubmit: fn(),
+  },
+};
+
+export const ShowsValidationErrorOnEmptySubmit: Story = {
+  args: {
+    isPending: false,
+    onSubmit: fn(),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const submitButton = canvas.getByRole("button", {
+      name: CREATE_TRIP_COPY.submitButton,
+    });
+
+    await userEvent.click(submitButton);
+
+    await expect(canvas.getByRole("alert").textContent).toBe(
+      CREATE_TRIP_COPY.nameRequired,
+    );
+    await expect(args.onSubmit).not.toHaveBeenCalled();
+  },
+};
+
+export const SubmitsWithValidInput: Story = {
+  args: {
+    isPending: false,
+    onSubmit: fn(),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.type(
+      canvas.getByLabelText(CREATE_TRIP_COPY.nameLabel),
+      "Beach Weekend",
+    );
+    await userEvent.type(
+      canvas.getByLabelText(CREATE_TRIP_COPY.descriptionLabel),
+      "Summer trip",
+    );
+    await userEvent.click(
+      canvas.getByRole("button", { name: CREATE_TRIP_COPY.submitButton }),
+    );
+
+    await expect(args.onSubmit).toHaveBeenCalledWith(
+      "Beach Weekend",
+      "Summer trip",
+    );
   },
 };
