@@ -1,2 +1,6 @@
 onlyBuiltDependencies:
+  - "@firebase/util"
+  - esbuild
+  - msw
+  - protobufjs
   - vercel-deploy-scripts
