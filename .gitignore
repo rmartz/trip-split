@@ -50,3 +50,4 @@ storybook-static/
 # lock files from wrong package managers
 package-lock.json
 yarn.lock
+.env*.local
