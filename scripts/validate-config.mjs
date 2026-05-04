@@ -19,25 +19,6 @@ import { fileURLToPath } from "url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const deploymentDir = join(root, "deployment");
 
-function parseYamlSimple(content) {
-  // Minimal YAML parser for the constrained flat-key: value format used here.
-  // Does not handle anchors, multiline values, or nested structures.
-  const result = {};
-  for (const rawLine of content.split("\n")) {
-    const line = rawLine.replace(/#.*$/, "").trim();
-    if (!line) continue;
-    const colonIndex = line.indexOf(":");
-    if (colonIndex === -1) continue;
-    const key = line.slice(0, colonIndex).trim();
-    const value = line
-      .slice(colonIndex + 1)
-      .trim()
-      .replace(/^["']|["']$/g, "");
-    if (key) result[key] = value;
-  }
-  return result;
-}
-
 function parseYamlList(content, listKey) {
   const lines = content.split("\n");
   const items = [];
@@ -85,10 +66,8 @@ function loadSchema() {
 
 function loadEnvironments() {
   const content = readFileSync(join(deploymentDir, "environments.yml"), "utf8");
-  const envs = parseYamlList(content, "environments");
-  const parsed = parseYamlSimple(content);
-  const singleEnv = parsed["single_environment"] === "true";
-  return { environments: envs, singleEnvironment: singleEnv };
+  const envs = parseYamlList(content, "active");
+  return { environments: envs };
 }
 
 function validateConfig(envName, schema) {
@@ -148,15 +127,15 @@ function validateConfig(envName, schema) {
 const args = process.argv.slice(2);
 const envArg = args.find((a) => a.startsWith("--env="))?.slice(6);
 
-const { environments, singleEnvironment } = loadEnvironments();
+const { environments } = loadEnvironments();
 const schema = loadSchema();
 
 const toValidate = envArg ? [envArg] : environments;
 
-if (!singleEnvironment && environments.length < 2 && !envArg) {
+if (environments.length < 2 && !envArg) {
   console.error(
-    "ERROR: environments.yml lists fewer than 2 environments but single_environment is not true.\n" +
-      "Set single_environment: true if this project intentionally uses one environment.",
+    "ERROR: environments.yml lists fewer than 2 active environments.\n" +
+      "Add missing environments or remove unused ones from deployment/environments.yml.",
   );
   process.exit(1);
 }
