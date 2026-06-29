@@ -3,4 +3,4 @@ onlyBuiltDependencies:
   - esbuild
   - msw
   - protobufjs
-  - vercel-deploy-scripts
+  - "vercel-deploy-scripts@https://codeload.github.com/rmartz/vercel-deploy-scripts/tar.gz/b0f882996cd44fc5960da65c627e6e240982441b"
