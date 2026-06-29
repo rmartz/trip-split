@@ -3,4 +3,4 @@ onlyBuiltDependencies:
   - esbuild
   - msw
   - protobufjs
-  - vercel-deploy-scripts
+  - "vercel-deploy-scripts@0.0.0"
