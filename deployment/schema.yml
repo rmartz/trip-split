@@ -19,6 +19,7 @@ allowed_patterns:
 # These are identifiers / slugs, not credentials.
 allowed_keys:
   - FIREBASE_PROJECT_ID # Non-sensitive; also exposed via NEXT_PUBLIC_FIREBASE_PROJECT_ID
+  - FIREBASE_SA_EMAIL # Service account identifier — not a credential; safe to commit
   - FIREBASE_DATABASE_URL # Non-sensitive RTDB URL; also exposed as NEXT_PUBLIC_FIREBASE_DATABASE_URL when used client-side
   - SENTRY_ORG # Sentry organisation slug — not a credential
   - SENTRY_PROJECT # Sentry project slug — not a credential
