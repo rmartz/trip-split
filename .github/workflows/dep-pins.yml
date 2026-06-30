@@ -1,0 +1,25 @@
+name: Dependency Pins
+
+# Only runs on changes that touch the dependency manifests, so unrelated PRs
+# don't pay for a check that can only be affected by a package update.
+on:
+  pull_request:
+    paths:
+      - "package.json"
+      - "pnpm-lock.yaml"
+  push:
+    branches: [main]
+    paths:
+      - "package.json"
+      - "pnpm-lock.yaml"
+
+jobs:
+  dep-pins:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/check-dep-pins.mjs

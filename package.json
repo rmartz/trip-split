@@ -18,7 +18,8 @@
     "prepare": "husky",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "env:validate": "node scripts/validate-config.mjs"
+    "env:validate": "node scripts/validate-config.mjs",
+    "check:deps": "node scripts/check-dep-pins.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
