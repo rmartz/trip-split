@@ -4,6 +4,11 @@
 
 - Always use `pnpm`. Never `npm` or `yarn`.
 
+## Dependency Pinning
+
+- Every dependency in `package.json` must specify a full `major.minor.patch` version, including those with range annotations like `^` or `~` (e.g. `"^10.0.1"`, never `"^10"` or `"^10.3"`). A bare-major or major.minor range hides which version is actually installed, so a Dependabot bump that stays within the range produces no visible `package.json` diff. Full versions make every bump explicit and reviewable in the PR diff.
+- When adding a dependency, pin it to the full version that resolves at install time. When this rule surfaces an existing loose pin, expand it to the currently-resolved version (read it from `pnpm-lock.yaml`) rather than bumping — tightening the specifier format is not a version upgrade.
+
 ## Common Commands
 
 ```bash
