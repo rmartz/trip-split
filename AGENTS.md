@@ -11,12 +11,18 @@ pnpm dev              # Start dev server
 pnpm build            # Production build
 pnpm lint             # Lint
 pnpm format           # Format
-pnpm test             # Run tests with Vitest
+pnpm test             # Run all tests with Vitest
+pnpm test:unit        # Run node + component tests (no browser)
+pnpm test:storybook   # Run Storybook stories as browser tests (Chromium; needs `pnpm exec playwright install chromium`)
 pnpm typecheck        # Type check
 pnpm storybook        # Start Storybook dev server (port 6006)
 pnpm build-storybook  # Build static Storybook
 pnpm env:validate     # Validate deployment config files against schema
 ```
+
+## Worktree Setup
+
+After creating a git worktree (`git worktree add .git-worktrees/`), run `pnpm install --frozen-lockfile` inside it before invoking any build, test, or lint commands. pnpm's `node-modules` linker creates per-directory `node_modules` trees; a fresh worktree has none. The global store is already populated so this step only creates hardlinks — it takes a few seconds and requires no network access.
 
 ## Deployment Config
 
@@ -157,7 +163,7 @@ Trip Split stores user data persistently in Firebase. Once the app reaches MVP w
 - Branch names: lowercase with hyphens, prefixed by type and suffixed with issue number: `feat/`, `chore/`, `refactor/`, `fix/`, `docs/` (e.g., `feat/add-expense-15`).
 - Commit messages within a branch: imperative verbs, no Conventional Commits prefix (e.g., `Add expense form validation`, `Fix member count display`). Individual commits should read clearly on their own — `feat:` prefixes add noise when reviewing a PR's commit list.
 - PR titles must follow Conventional Commits format: `<type>: description` (e.g., `feat: add expense form`). PRs are squash-merged, so the PR title becomes the single commit on main. Valid types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `style`, `perf`, `ci`, `build`, `revert`. Use `feat!:` for breaking schema changes. Enforced by CI.
-- PR descriptions must use `Closes #123`, `Fixes #123`, or `Resolves #123` to trigger GitHub's automatic issue close on merge.
+- PR descriptions must use `Closes #123`, `Fixes #123`, or `Resolves #123` to trigger GitHub's automatic issue close on merge. Phrases like "Addresses #123" or "Related to #123" do NOT trigger auto-close.
 
 ## Documentation
 
