@@ -3,6 +3,7 @@
 import { useAuth } from "@/components/auth";
 import {
   useAddMemberMutation,
+  useDeleteExpenseMutation,
   useDeleteTripMutation,
   useExpenses,
   useMembers,
@@ -22,6 +23,7 @@ export function TripDetailContent({ tripId }: TripDetailContentProps) {
   const { data: expenses, isLoading: isExpensesLoading } = useExpenses(tripId);
   const addMemberMutation = useAddMemberMutation();
   const deleteTripMutation = useDeleteTripMutation();
+  const deleteExpenseMutation = useDeleteExpenseMutation();
 
   if (isTripLoading) {
     return (
@@ -41,6 +43,7 @@ export function TripDetailContent({ tripId }: TripDetailContentProps) {
 
   return (
     <TripDetailView
+      currentUserId={user?.uid}
       expenses={expenses ?? []}
       isAddingMember={addMemberMutation.isPending}
       isCreator={user?.uid === trip.createdBy}
@@ -50,6 +53,9 @@ export function TripDetailContent({ tripId }: TripDetailContentProps) {
       onAddMember={(name) => {
         if (!user) return;
         addMemberMutation.mutate({ addedBy: user.uid, name, tripId });
+      }}
+      onDeleteExpense={(expenseId) => {
+        deleteExpenseMutation.mutate({ expenseId, tripId });
       }}
       onDeleteTrip={() => {
         deleteTripMutation.mutate(tripId);
