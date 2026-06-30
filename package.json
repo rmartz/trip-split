@@ -19,7 +19,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "env:validate": "node scripts/validate-config.mjs",
-    "check:deps": "node scripts/check-dep-pins.mjs"
+    "pins:check": "node scripts/check-package-pins.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -58,7 +58,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.0.3",
     "playwright": "^1.59.1",
-    "prettier": "^3.8.3",
+    "prettier": "^3.9.4",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "shadcn": "^4.7.0",
     "storybook": "^10.3.6",
