@@ -9,6 +9,19 @@ updates:
       prefix-development: "chore"
       include: "scope"
     groups:
+      # Isolate prettier into its own PR for ALL bumps (major, minor, and patch):
+      # even a minor/patch bump can reformat the entire codebase, so it must be
+      # reviewed on its own rather than bundled into the dev-dependencies group
+      # (see #114, where a 3.8.3 -> 3.9.4 bump rode in unseen). Listed first so it
+      # wins group-assignment precedence — a dependency joins the first group
+      # whose patterns match.
+      prettier:
+        patterns:
+          - prettier
+        update-types:
+          - major
+          - minor
+          - patch
       dev-dependencies:
         dependency-type: development
         patterns:
