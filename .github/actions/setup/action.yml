@@ -5,9 +5,19 @@ runs:
   using: "composite"
   steps:
     - uses: pnpm/action-setup@v5
+      with:
+        # Pin the exact pnpm version so CI matches local installs. The floating
+        # "10" tag resolves to the latest 10.x (10.34.x), which enforces
+        # ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED for the git-hosted
+        # vercel-deploy-scripts dependency and fails `install --frozen-lockfile`.
+        version: 10.30.3
     - uses: actions/setup-node@v6
       with:
-        node-version: 24.x
+        # Pin the exact Node version. The floating "24.x" tag resolves to
+        # >=24.16.0 (currently 24.17.0), which carries an extract-zip/yauzl
+        # regression that hangs `playwright install` indefinitely right after
+        # the browser download reaches 100%. 24.15.0 is the last good 24.x.
+        node-version: 24.15.0
         cache: "pnpm"
     - run: git config --global url."https://x-access-token:${{ github.token }}@github.com/".insteadOf "git@github.com:"
       shell: bash

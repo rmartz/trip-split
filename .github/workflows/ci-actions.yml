@@ -32,8 +32,32 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
-      - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test
+      - run: pnpm test:unit
+
+  storybook-test:
+    name: Storybook Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup
+      - name: Resolve Playwright version
+        id: playwright
+        shell: bash
+        run: echo "version=$(pnpm exec playwright --version | sed 's/^Version //')" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+      # Browser binary (~170 MiB) is cacheable; skip the download on a cache hit.
+      - name: Install Playwright browser
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install chromium
+      # apt system libraries are not cacheable, so always (re)install them.
+      - name: Install Playwright system dependencies
+        run: pnpm exec playwright install-deps chromium
+      - run: pnpm test:storybook
 
   build:
     name: Build
