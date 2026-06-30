@@ -22,8 +22,9 @@ variables:
   NEXT_PUBLIC_FIREBASE_APP_ID: "1:426225381029:web:3a3c0648c2d5e95fb2e74c"
   NEXT_PUBLIC_FIREBASE_DATABASE_URL: "https://trip-split-317c7-default-rtdb.firebaseio.com"
 
-  # Firebase Admin SDK — project identifier only, not a credential
-  FIREBASE_PROJECT_ID: ""
+  # Firebase Admin SDK — identifiers only, not credentials
+  FIREBASE_PROJECT_ID: "trip-split-317c7"
+  FIREBASE_SA_EMAIL: "firebase-adminsdk-fbsvc@trip-split-317c7.iam.gserviceaccount.com"
 
   # Sentry — slugs only, not credentials
   NEXT_PUBLIC_SENTRY_DSN: ""
