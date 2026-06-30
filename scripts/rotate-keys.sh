@@ -328,4 +328,4 @@ for env in "${ENVS_TO_ROTATE[@]}"; do
 done
 
 echo "All rotations complete."
-echo "Run 'pnpm env:pull' to refresh your local .env.local with the new staging credentials."
+echo "Run 'vercel env pull' to refresh your local .env.local with the new staging credentials."

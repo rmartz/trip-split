@@ -194,4 +194,4 @@ function upsertEnv(key, value) {
 NODE
 
 echo ""
-echo "Done. Run 'pnpm env:pull' to refresh your local .env.local."
+echo "Done. Run 'vercel env pull' to refresh your local .env.local."
