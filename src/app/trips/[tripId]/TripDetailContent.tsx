@@ -1,8 +1,10 @@
 "use client";
 
 import { useAuth } from "@/components/auth";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   useAddMemberMutation,
+  useDeleteExpenseMutation,
   useDeleteTripMutation,
   useExpenses,
   useMembers,
@@ -22,11 +24,18 @@ export function TripDetailContent({ tripId }: TripDetailContentProps) {
   const { data: expenses, isLoading: isExpensesLoading } = useExpenses(tripId);
   const addMemberMutation = useAddMemberMutation();
   const deleteTripMutation = useDeleteTripMutation();
+  const deleteExpenseMutation = useDeleteExpenseMutation();
 
   if (isTripLoading) {
     return (
-      <div className="mx-auto w-full max-w-3xl px-4 py-8">
-        <p className="text-muted-foreground">{TRIP_DETAIL_COPY.loading}</p>
+      <div className="mx-auto w-full max-w-3xl space-y-4 px-4 py-8">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-4 w-64" />
+        <div className="mt-4 space-y-2">
+          <Skeleton className="h-14 w-full" />
+          <Skeleton className="h-14 w-full" />
+          <Skeleton className="h-14 w-full" />
+        </div>
       </div>
     );
   }
@@ -41,6 +50,7 @@ export function TripDetailContent({ tripId }: TripDetailContentProps) {
 
   return (
     <TripDetailView
+      currentUserId={user?.uid}
       expenses={expenses ?? []}
       isAddingMember={addMemberMutation.isPending}
       isCreator={user?.uid === trip.createdBy}
@@ -50,6 +60,9 @@ export function TripDetailContent({ tripId }: TripDetailContentProps) {
       onAddMember={(name) => {
         if (!user) return;
         addMemberMutation.mutate({ addedBy: user.uid, name, tripId });
+      }}
+      onDeleteExpense={(expenseId) => {
+        deleteExpenseMutation.mutate({ expenseId, tripId });
       }}
       onDeleteTrip={() => {
         deleteTripMutation.mutate(tripId);

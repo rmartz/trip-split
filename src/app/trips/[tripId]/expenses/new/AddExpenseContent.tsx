@@ -1,9 +1,9 @@
 "use client";
 
 import { useAuth } from "@/components/auth";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAddExpenseMutation, useMembers } from "@/lib/hooks";
 import type { ExpenseFormSubmitData } from "@/types";
-import { ADD_EXPENSE_COPY } from "./AddExpenseFormView.copy";
 import { AddExpenseFormView } from "./AddExpenseFormView";
 
 interface AddExpenseContentProps {
@@ -37,8 +37,12 @@ export function AddExpenseContent({ tripId }: AddExpenseContentProps) {
 
   if (isLoading) {
     return (
-      <div className="mx-auto w-full max-w-lg px-4 py-8">
-        <p className="text-muted-foreground">{ADD_EXPENSE_COPY.loading}</p>
+      <div className="mx-auto w-full max-w-lg space-y-4 px-4 py-8">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-4 w-64" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
       </div>
     );
   }
