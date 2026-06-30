@@ -5,7 +5,7 @@
 # will be rejected by the pre-commit hook and CI.
 #
 # Sensitive variables are managed directly in Vercel and are never committed.
-# Run `pnpm env:pull` to generate a local .env.local from Vercel's stored values.
+# Run `vercel env pull` to generate a local .env.local from Vercel's stored values.
 #
 # To update values: scripts/update-config.sh --env=production KEY=value (or --firebase-config=...)
 # To deploy to Vercel: scripts/deploy-config.sh --env=production

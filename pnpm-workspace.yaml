@@ -3,4 +3,3 @@ onlyBuiltDependencies:
   - esbuild
   - msw
   - protobufjs
-  - vercel-deploy-scripts
