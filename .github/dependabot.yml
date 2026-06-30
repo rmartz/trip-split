@@ -12,9 +12,13 @@ updates:
       # Formatter/linter tooling is isolated into its own per-tool groups so a
       # bump lands in a dedicated PR rather than bundled with the catch-all
       # dev-dependencies group. Prettier in particular reformats source on minor
-      # bumps (see #114), so its updates must be reviewable on their own. Listed
-      # first to win group-assignment precedence (a dependency joins the first
-      # group whose patterns match); majors included so every bump stays grouped.
+      # bumps (see #114), so its major/minor updates must be reviewable on their
+      # own. Listed first to win group-assignment precedence (a dependency joins
+      # the first group whose patterns match).
+      #
+      # Prettier splits only major/minor — patch bumps don't change formatting,
+      # so they fall through to the dev-dependencies group and ride along with
+      # everyone else's minor/patch bumps instead of opening a noisy lone PR.
       prettier:
         patterns:
           - "prettier"
@@ -22,7 +26,6 @@ updates:
         update-types:
           - "major"
           - "minor"
-          - "patch"
       eslint:
         patterns:
           - "eslint"
