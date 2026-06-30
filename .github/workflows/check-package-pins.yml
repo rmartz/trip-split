@@ -1,0 +1,27 @@
+name: Package Pins
+
+# Only runs on PRs that touch dependency manifests or the lockfile — there is
+# nothing to check on a PR that doesn't alter dependencies.
+on:
+  pull_request:
+    paths:
+      - "package.json"
+      - "**/package.json"
+      - "pnpm-lock.yaml"
+
+permissions:
+  contents: read
+
+jobs:
+  check-pins:
+    name: Package version pins
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v7
+      # The check reads package.json with Node built-ins only — no pnpm install
+      # needed, so use a lightweight Node setup instead of the project setup.
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.15.0
+      - run: node scripts/check-package-pins.mjs
