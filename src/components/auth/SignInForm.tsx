@@ -13,12 +13,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useSignInMutation } from "@/lib/hooks";
+import { useSignInMutation, useSignInWithGoogleMutation } from "@/lib/hooks";
 import { getAuthErrorMessage } from "@/lib/auth-errors";
 import { AUTH_COPY } from "@/constants/copy";
 
 const copy = AUTH_COPY.signIn;
 const errors = AUTH_COPY.errors;
+const googleCopy = AUTH_COPY.google;
 
 export function SignInForm() {
   const [email, setEmail] = useState("");
@@ -28,6 +29,7 @@ export function SignInForm() {
   );
 
   const mutation = useSignInMutation();
+  const googleMutation = useSignInWithGoogleMutation();
 
   const validate = (): string | undefined => {
     if (!email.trim()) return errors.emailRequired;
@@ -38,6 +40,7 @@ export function SignInForm() {
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
     setValidationError(undefined);
+    googleMutation.reset();
 
     const error = validate();
     if (error) {
@@ -50,7 +53,12 @@ export function SignInForm() {
 
   const displayError =
     validationError ??
-    (mutation.error ? getAuthErrorMessage(mutation.error) : undefined);
+    (mutation.error ? getAuthErrorMessage(mutation.error) : undefined) ??
+    (googleMutation.error
+      ? getAuthErrorMessage(googleMutation.error)
+      : undefined);
+
+  const isPending = mutation.isPending || googleMutation.isPending;
 
   return (
     <Card className="w-full max-w-sm">
@@ -70,6 +78,7 @@ export function SignInForm() {
               onChange={(e) => {
                 setEmail(e.target.value);
                 setValidationError(undefined);
+                googleMutation.reset();
               }}
               autoComplete="email"
             />
@@ -83,6 +92,7 @@ export function SignInForm() {
               onChange={(e) => {
                 setPassword(e.target.value);
                 setValidationError(undefined);
+                googleMutation.reset();
               }}
               autoComplete="current-password"
             />
@@ -92,12 +102,28 @@ export function SignInForm() {
               {displayError}
             </p>
           )}
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={mutation.isPending}
-          >
+          <Button type="submit" className="w-full" disabled={isPending}>
             {mutation.isPending ? copy.submittingButton : copy.submitButton}
+          </Button>
+          <div className="relative flex items-center">
+            <div className="border-muted flex-grow border-t" />
+            <span className="text-muted-foreground mx-3 flex-shrink text-xs">
+              {googleCopy.orDivider}
+            </span>
+            <div className="border-muted flex-grow border-t" />
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={isPending}
+            onClick={() => {
+              mutation.reset();
+              setValidationError(undefined);
+              googleMutation.mutate();
+            }}
+          >
+            {googleCopy.signInButton}
           </Button>
           <p className="text-muted-foreground text-center text-sm">
             {copy.noAccount}{" "}
