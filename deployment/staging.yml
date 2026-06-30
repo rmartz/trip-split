@@ -5,7 +5,7 @@
 # will be rejected by the pre-commit hook and CI.
 #
 # Sensitive variables are managed directly in Vercel and are never committed.
-# Run `pnpm env:pull` to generate a local .env.local from Vercel's stored values.
+# Run `vercel env pull` to generate a local .env.local from Vercel's stored values.
 #
 # To update values: scripts/update-config.sh --env=staging KEY=value (or --firebase-config=...)
 # To deploy to Vercel: scripts/deploy-config.sh --env=staging
@@ -22,8 +22,9 @@ variables:
   NEXT_PUBLIC_FIREBASE_APP_ID: "1:344480940938:web:8d0c7ef79d1915d7f8be73"
   NEXT_PUBLIC_FIREBASE_DATABASE_URL: ""
 
-  # Firebase Admin SDK — project identifier only, not a credential
+  # Firebase Admin SDK — identifiers only, not credentials
   FIREBASE_PROJECT_ID: "trip-split-staging"
+  FIREBASE_SA_EMAIL: "firebase-adminsdk-fbsvc@trip-split-staging.iam.gserviceaccount.com"
 
   # Sentry — slugs only, not credentials
   NEXT_PUBLIC_SENTRY_DSN: ""
