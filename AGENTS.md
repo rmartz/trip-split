@@ -7,6 +7,7 @@
 ## Dependencies
 
 - **Every dependency pin in `package.json` must specify the full `major.minor.patch` version**, even with a range annotation — e.g. `"prettier": "^3.8.3"`, never `"prettier": "^3"` or `"prettier": "^3.8"`. Pin to the version currently resolved in `pnpm-lock.yaml`, preserving any `^`/`~` annotation. This keeps Dependabot version bumps visible in the `package.json` diff: with an abbreviated pin like `^3`, a minor/patch bump (which can still require code changes — e.g. a Prettier reformat) changes only `pnpm-lock.yaml` and is easy to miss in review. A full pin forces every bump to update `package.json` too.
+- This is enforced in CI by the `Package Pins` workflow (`pnpm pins:check`), which runs on any PR that touches `package.json` or `pnpm-lock.yaml` and fails on a non-full pin.
 
 ## Common Commands
 
@@ -22,6 +23,7 @@ pnpm typecheck        # Type check
 pnpm storybook        # Start Storybook dev server (port 6006)
 pnpm build-storybook  # Build static Storybook
 pnpm env:validate     # Validate deployment config files against schema
+pnpm pins:check       # Verify package.json pins specify full versions
 ```
 
 ## Worktree Setup
