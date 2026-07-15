@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v7
       # The check reads package.json with Node built-ins only — no pnpm install
       # needed, so use a lightweight Node setup instead of the project setup.
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 24.15.0
       - run: node scripts/check-package-pins.mjs
