@@ -22,14 +22,14 @@
     "pins:check": "node scripts/check-package-pins.mjs"
   },
   "dependencies": {
-    "@base-ui/react": "^1.6.0",
+    "@base-ui/react": "^1.7.0",
     "@sentry/nextjs": "10.69.0",
     "@tanstack/react-query": "^5.101.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "firebase": "^12.17.0",
-    "lucide-react": "^1.28.0",
-    "next": "16.2.12",
+    "firebase": "^12.17.1",
+    "lucide-react": "^1.30.0",
+    "next": "16.3.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "sonner": "^2.0.7",
