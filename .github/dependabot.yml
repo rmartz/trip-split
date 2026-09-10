@@ -36,6 +36,19 @@ updates:
           - "major"
           - "minor"
           - "patch"
+      typescript:
+        # TypeScript is the language itself, not just another dependency — a
+        # compiler major/minor can surface new type errors across the codebase,
+        # and a major can break the toolchain outright, so isolate it into its
+        # own PR for visibility (like prettier above). A typescript *patch*
+        # matches no update-type here and falls through to dev-dependencies,
+        # staying batched. The exact "typescript" pattern leaves
+        # typescript-eslint untouched — it stays in the eslint family above.
+        patterns:
+          - "typescript"
+        update-types:
+          - "major"
+          - "minor"
       dev-dependencies:
         dependency-type: development
         patterns:
